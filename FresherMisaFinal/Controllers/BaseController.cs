@@ -1,0 +1,137 @@
+using FresherMisa.Application.Interfaces.Services;
+using FresherMisa.Entities;
+using FresherMisa.Entities.Enums;
+using Microsoft.AspNetCore.Mvc;
+
+namespace FresherMisa.WebAPI.Controllers
+{
+    /// <summary>
+    /// Controller generic dùng chung cho các entity. Cung cấp các endpoint chuẩn: GET list, GET by id, POST, PUT, DELETE.
+    /// Các controller cụ thể sẽ kế thừa BaseController<TEntity> và được inject IBaseService<TEntity>.
+    /// </summary>
+    [ApiController]
+    [Route("/api/[controller]")]
+    public class BaseController<TEntity> : ControllerBase
+    {
+        private readonly IBaseService<TEntity> _baseService;
+
+        public BaseController(IBaseService<TEntity> baseService)
+        {
+            _baseService = baseService;
+        }
+
+        /// <summary>
+        /// Danh sách paging
+        /// </summary>
+        [HttpGet("Paging")]
+        public async Task<ActionResult<ServiceResponse>> GetFilterPaging(
+            [FromQuery] string? search,
+            [FromQuery] string? sort,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int pageIndex = 1,
+            [FromQuery] string? searchFields = null
+        )
+        {
+            var pagingRequest = new PagingRequest
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                Search = search ?? string.Empty,
+                Sort = sort ?? string.Empty,
+                SearchFields = searchFields ?? string.Empty
+            };
+            
+            var response = await _baseService.GetFilterPagingAsync(pagingRequest);
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Danh sách
+        /// GET /api/{controller}
+        /// Trả về ServiceResponse với Data là danh sách entity
+        /// </summary>
+        [HttpGet()]
+        public async Task<ActionResult<ServiceResponse>> Get()
+        {
+            var response = await _baseService.GetEntitiesAsync();
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Một phần tử
+        /// GET /api/{controller}/{ID}
+        /// </summary>
+        [HttpGet("{ID}")]
+        public async Task<ActionResult<ServiceResponse>> GetByID(Guid ID)
+        {
+            var response = await _baseService.GetEntityByIDAsync(ID);
+
+            if (!response.IsSuccess && response.Code == (int)ResponseCode.NotFound)
+                return NotFound(response);
+            
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Xóa một phần tử
+        /// DELETE /api/{controller}/{ID}
+        /// Trả về ServiceResponse với IsSuccess=true nếu xóa thành công
+        /// </summary>
+        [HttpDelete("{ID}")]
+        public async Task<ActionResult<ServiceResponse>> DeleteByID(Guid ID)
+        {
+            var response = await _baseService.DeleteByIDAsync(ID);
+            
+            if (!response.IsSuccess && response.Code == (int)ResponseCode.NotFound)
+                return NotFound(response);
+            
+            if (!response.IsSuccess && response.Code == (int)ResponseCode.BadRequest)
+                return BadRequest(response);
+                
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Thêm một thực thể mới
+        /// POST /api/{controller}
+        /// Trả về status code 201 Created nếu thành công, 400 nếu validate lỗi.
+        /// </summary>
+        [HttpPost]
+        public async Task<ActionResult<ServiceResponse>> Post([FromBody] TEntity entity)
+        {
+            try
+            {
+                var response = await _baseService.InsertAsync(entity);
+                
+                if (!response.IsSuccess)
+                    return BadRequest(response);
+
+                return StatusCode((int)ResponseCode.Created, response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Sửa một thực thể
+        /// PUT /api/{controller}/{id}
+        /// Trả về 200 OK nếu thành công, 400/404/500 tuỳ trường hợp lỗi.
+        /// </summary>
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ServiceResponse>> Put([FromRoute] string id, [FromBody] TEntity entity)
+        {
+            var response = await _baseService.UpdateAsync(Guid.Parse(id), entity);
+
+            if (!response.IsSuccess)
+            {
+                if (response.Code == (int)ResponseCode.NotFound)
+                    return NotFound(response);
+                return BadRequest(response);
+            }
+
+            return Ok(response);
+        }
+    }
+}

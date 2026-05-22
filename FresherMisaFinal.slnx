@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="D:/Misa/FresherMisaFinal/FresherMisa.Application/FresherMisa.Application.csproj" />
+  <Project Path="D:/Misa/FresherMisaFinal/FresherMisa.Entities/FresherMisa.Entities.csproj" />
+  <Project Path="D:/Misa/FresherMisaFinal/FresherMisa.Infrastructure/FresherMisa.Infrastructure.csproj" />
+  <Project Path="D:/Misa/FresherMisaFinal/FresherMisaFinal/FresherMisaFinal.csproj" />
+</Solution>
