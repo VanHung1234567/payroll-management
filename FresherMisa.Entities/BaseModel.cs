@@ -29,7 +29,7 @@ namespace FresherMisa.Entities
         /// <summary>
         /// Ngày tạo bản ghi. Có thể null nếu chưa bao giờ được gán.
         /// </summary>
-        public DateTime? CreateDate { get; set; }
+        public DateTime? CreatedDate { get; set; }
         
         /// <summary>
         /// Người sửa bản ghi gần nhất.

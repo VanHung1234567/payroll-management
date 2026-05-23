@@ -166,7 +166,7 @@ namespace FresherMisa.Infrastructure.Repositories
                     dynamicParams.Add($"@v_{keyName}", entityId);
 
                     //2. Kết nối tới CSDL:
-                    rowAffects = await _dbConnection.ExecuteAsync($"Proc_Delete{_tableName}ById", param: dynamicParams, transaction: transaction, commandType: CommandType.StoredProcedure);
+                    rowAffects = await _dbConnection.ExecuteAsync($"Proc_Delete{_modelType.Name}ById", param: dynamicParams, transaction: transaction, commandType: CommandType.StoredProcedure);
 
                     transaction.Commit();
                 }
@@ -201,7 +201,7 @@ namespace FresherMisa.Infrastructure.Repositories
                     var parameters = MappingDbType(entity);
 
                     //2.Thực hiện thêm bản ghi
-                    rowAffects = await _dbConnection.ExecuteAsync($"Proc_Insert{_tableName}", param: parameters, transaction: transaction, commandType: CommandType.StoredProcedure);
+                    rowAffects = await _dbConnection.ExecuteAsync($"Proc_Insert{_modelType.Name}", param: parameters, transaction: transaction, commandType: CommandType.StoredProcedure);
 
                     transaction.Commit();
                 }
@@ -240,7 +240,7 @@ namespace FresherMisa.Infrastructure.Repositories
                     entity.GetType().GetProperty(keyName).SetValue(entity, entityId);
 
                     //3. Kết nối tới CSDL:
-                    rowAffects = await _dbConnection.ExecuteAsync($"Proc_Update{_tableName}", param: parameters, transaction: transaction, commandType: CommandType.StoredProcedure);
+                    rowAffects = await _dbConnection.ExecuteAsync($"Proc_Update{_modelType.Name}", param: parameters, transaction: transaction, commandType: CommandType.StoredProcedure);
 
                     transaction.Commit();
                 }
@@ -264,20 +264,20 @@ namespace FresherMisa.Infrastructure.Repositories
         /// <param name="sort">Sắp xếp theo</param>
         /// <returns>Tổng số bản ghi và danh sách dữ liệu</returns>
         /// CREATED BY: DVHAI (07/07/2026)
-        public async Task<(long Total,
-            IEnumerable<TEntity> Data)> GetFilterPagingAsync(
-            int pageSize,
-            int pageIndex,
-            string search,
-            List<string> searchFields,
-            string sort)
+        public async Task<PagingResponse<TEntity>> GetFilterPagingAsync(
+    int pageSize,
+    int pageIndex,
+    string search,
+    List<string> searchFields,
+    string sort)
         {
             long total = 0;
             var data = Enumerable.Empty<TEntity>();
 
             await OpenConnectionAsync();
 
-            string store = string.Format("Proc_{0}_FilterPaging", _tableName);
+            string store = string.Format("Proc_{0}_FilterPaging", _modelType.Name);
+
             var parameters = new DynamicParameters();
             parameters.Add("@v_pageIndex", pageIndex);
             parameters.Add("@v_pageSize", pageSize);
@@ -289,9 +289,16 @@ namespace FresherMisa.Infrastructure.Repositories
                 new CommandDefinition(store, parameters, commandType: CommandType.StoredProcedure));
 
             data = (await reader.ReadAsync<TEntity>()).ToList();
+
             total = await reader.ReadFirstAsync<long>();
 
-            return (total, data);
+            return new PagingResponse<TEntity>
+            {
+                Total = total,
+                PageSize = pageSize,
+                PageIndex = pageIndex,
+                Data = data.ToList()
+            };
         }
 
         /// <summary>

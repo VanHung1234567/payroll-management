@@ -1,13 +1,10 @@
-﻿using FresherMisa.Application.Interfaces.Services;
-using FresherMisa.Entities;
-using FresherMisa.Entities.Enums;
-using FresherMisa.Entities.Extensions;
-using FresherMisa.Application.Interfaces;
+﻿using FresherMisa.Application.Interfaces;
 using FresherMisa.Application.Interfaces.Services;
 using FresherMisa.Entities;
 using FresherMisa.Entities.Enums;
 using FresherMisa.Entities.Extensions;
 using System.Collections.Concurrent;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
 namespace FresherMisa.Application.Services
@@ -199,6 +196,8 @@ namespace FresherMisa.Application.Services
         {
             entity.State = ModelSate.Add;
 
+            AutoGeneratePrimaryKey(entity);
+
             //1. Validate tất cả các trường nếu được gắn thẻ
             var errors = Validate(entity);
 
@@ -254,6 +253,8 @@ namespace FresherMisa.Application.Services
             );
         }
 
+       
+
         /// <summary>
         /// Lấy danh sách thực thể paging
         /// </summary>
@@ -264,23 +265,51 @@ namespace FresherMisa.Application.Services
         {
             var fields = string.IsNullOrEmpty(pagingRequest.SearchFields)
                 ? new List<string>()
-                : pagingRequest.SearchFields.Split(SearchFieldSeparator, StringSplitOptions.RemoveEmptyEntries).ToList();
+                : pagingRequest.SearchFields
+                    .Split(SearchFieldSeparator, StringSplitOptions.RemoveEmptyEntries)
+                    .ToList();
 
-            var (total, data) = await _baseRepository.GetFilterPagingAsync(
-                pagingRequest.PageSize,
-                pagingRequest.PageIndex,
-                pagingRequest.Search,
-                fields,
-                pagingRequest.Sort
-            );
+             var response = await _baseRepository.GetFilterPagingAsync(
+                    pagingRequest.PageSize,
+                    pagingRequest.PageIndex,
+                    pagingRequest.Search,
+                    fields,
+                    pagingRequest.Sort
+              );
 
-            var response = new PagingResponse<TEntity>
+                return CreateSuccessResponse(response);
+         }
+
+        private void AutoGeneratePrimaryKey(TEntity entity)
+        {
+            var keyProperty = typeof(TEntity)
+                .GetProperties()
+                .FirstOrDefault(p => Attribute.IsDefined(p, typeof(KeyAttribute)));
+
+            if (keyProperty == null)
             {
-                Total = total,
-                Data = data.ToList()
-            };
+                return;
+            }
 
-            return CreateSuccessResponse(response);
+            if (keyProperty.PropertyType == typeof(Guid))
+            {
+                var currentValue = (Guid)keyProperty.GetValue(entity)!;
+
+                if (currentValue == Guid.Empty)
+                {
+                    keyProperty.SetValue(entity, Guid.NewGuid());
+                }
+            }
+
+            if (keyProperty.PropertyType == typeof(Guid?))
+            {
+                var currentValue = (Guid?)keyProperty.GetValue(entity);
+
+                if (currentValue == null || currentValue == Guid.Empty)
+                {
+                    keyProperty.SetValue(entity, Guid.NewGuid());
+                }
+            }
         }
         #endregion
 
@@ -395,4 +424,6 @@ namespace FresherMisa.Application.Services
     /// <param name="Field">Tên trường</param>
     /// <param name="Message">Thông báo lỗi</param>
     public record ValidationError(string Field, string Message);
+
+    
 }

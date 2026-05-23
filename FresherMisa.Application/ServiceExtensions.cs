@@ -19,6 +19,10 @@ namespace FresherMisa.Application
             //base
             services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
             services.AddScoped<ISalaryCompositionService, SalaryCompositionService>();
+            services.AddScoped<IOrganizationService, OrganizationService>();
+            services.AddScoped<ISalaryCompositionTypeService, SalaryCompositionTypeService>();
+            services.AddScoped<ISalaryCompositionSystemService, SalaryCompositionSystemService>();
+            services.AddScoped<IGridConfigService, GridConfigService>();
             return services;
         }
     }

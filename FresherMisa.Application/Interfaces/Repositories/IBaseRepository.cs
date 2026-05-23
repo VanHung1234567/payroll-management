@@ -18,8 +18,7 @@ namespace FresherMisa.Application.Interfaces
         /// <param name="sort">Sắp xếp theo</param>
         /// <returns>Tổng số bản ghi và danh sách dữ liệu</returns>
         /// CREATED BY: DVHAI (07/07/2026)
-        Task<(long Total,
-            IEnumerable<TEntity> Data)> GetFilterPagingAsync(
+        Task<PagingResponse<TEntity>> GetFilterPagingAsync(
             int pageSize,
             int pageIndex,
             string search,

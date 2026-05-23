@@ -1,19 +1,17 @@
 ﻿using FresherMisa.Entities.Extensions;
 using System.ComponentModel.DataAnnotations;
 
-namespace FresherMisa.Entities.SalaryComposition
+namespace FresherMisa.Entities.SalaryCompositionSystem
 {
-    [ConfigTable("pa_salary_composition", false, "SalaryCompositionCode")]
-    public class SalaryComposition : BaseModel
+    [ConfigTable("pa_salary_composition_system", false, "SalaryCompositionCode")]
+    public class SalaryCompositionSystem : BaseModel
     {
         [Key]
-        public Guid SalaryCompositionID { get; set; }
+        public Guid SalaryCompositionSystemID { get; set; }
 
         public string? SalaryCompositionCode { get; set; }
 
         public string? SalaryCompositionName { get; set; }
-
-        public Guid OrganizationID { get; set; }
 
         public Guid SalaryCompositionTypeID { get; set; }
 
@@ -34,10 +32,5 @@ namespace FresherMisa.Entities.SalaryComposition
         public string? Description { get; set; }
 
         public int? PayslipDisplayType { get; set; }
-
-        public int? CreatedSource { get; set; }
-
-        public int? Status { get; set; }
-
     }
 }

@@ -6,11 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="GridConfig\" />
-    <Folder Include="Organization\" />
-    <Folder Include="SalaryCompositionType\" />
-    <Folder Include="SalaryCompositionSystem\" />
-  </ItemGroup>
-
 </Project>
