@@ -6,18 +6,18 @@ namespace FresherMisa.Entities
 {
     public class PagingRequest
     {
-        public int PageIndex { get; set; }
+        public int PageIndex { get; set; } = 1;
 
-        public int PageSize { get; set; }
+        public int PageSize { get; set; } = 15;
 
-        public string Search { get; set; }
+        public string? Search { get; set; }
 
-        public string Sort { get; set; } //vd: +ModifiedDate
+        public string? Sort { get; set; } //vd: +ModifiedDate
 
         /// <summary>
         /// DepartmentCode;DepartmentName
         /// </summary>
-        public string SearchFields { get; set; }
+        public string? SearchFields { get; set; }
     }
 
 }

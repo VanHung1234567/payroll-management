@@ -23,25 +23,13 @@ namespace FresherMisa.WebAPI.Controllers
         /// <summary>
         /// Danh sách paging
         /// </summary>
-        [HttpGet("Paging")]
+        [HttpPost("paging")]
         public async Task<ActionResult<ServiceResponse>> GetFilterPaging(
-            [FromQuery] string? search,
-            [FromQuery] string? sort,
-            [FromQuery] int pageSize = 10,
-            [FromQuery] int pageIndex = 1,
-            [FromQuery] string? searchFields = null
+            [FromBody] PagingRequest pagingRequest
         )
         {
-            var pagingRequest = new PagingRequest
-            {
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-                Search = search ?? string.Empty,
-                Sort = sort ?? string.Empty,
-                SearchFields = searchFields ?? string.Empty
-            };
-            
             var response = await _baseService.GetFilterPagingAsync(pagingRequest);
+
             return Ok(response);
         }
 

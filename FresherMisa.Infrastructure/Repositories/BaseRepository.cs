@@ -232,12 +232,13 @@ namespace FresherMisa.Infrastructure.Repositories
             {
                 try
                 {
-                    //1. Duyệt các thuộc tính trên customer và tạo parameters
-                    var parameters = MappingDbType(entity);
 
-                    //2. Ánh xạ giá trị id
+                    //1. Ánh xạ giá trị id
                     var keyName = _modelType.GetKeyName();
                     entity.GetType().GetProperty(keyName).SetValue(entity, entityId);
+
+                    //2. Duyệt các thuộc tính trên customer và tạo parameters
+                    var parameters = MappingDbType(entity);
 
                     //3. Kết nối tới CSDL:
                     rowAffects = await _dbConnection.ExecuteAsync($"Proc_Update{_modelType.Name}", param: parameters, transaction: transaction, commandType: CommandType.StoredProcedure);

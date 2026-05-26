@@ -1,4 +1,5 @@
 ﻿using FresherMisa.Application.Interfaces.Services;
+using FresherMisa.Entities;
 using FresherMisa.Entities.GridConfig;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,8 @@ namespace FresherMisa.Application.Interfaces.Services
 {
     public interface IGridConfigService : IBaseService<GridConfig>
     {
+
+        Task<ServiceResponse> GetByGridKeyAsync(string gridKey);
 
     }
 }

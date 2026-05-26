@@ -1,8 +1,9 @@
 ﻿using FresherMisa.Application.Interfaces;
-using FresherMisa.Application.Services;
 using FresherMisa.Application.Interfaces.Repositories;
 using FresherMisa.Application.Interfaces.Services;
+using FresherMisa.Application.Services;
 using FresherMisa.Entities;
+using FresherMisa.Entities.Enums;
 using FresherMisa.Entities.GridConfig;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,21 @@ namespace FresherMisa.Application.Services
             ) : base(baseRepository)
         {
             _gridConfigRepository = gridConfigRepository;
+        }
+
+        public async Task<ServiceResponse> GetByGridKeyAsync(string gridKey)
+        {
+            if (string.IsNullOrWhiteSpace(gridKey))
+            {
+                return CreateErrorResponse(
+                    ResponseCode.BadRequest,
+                    "GridKey không được để trống"
+                );
+            }
+
+            var data = await _gridConfigRepository.GetByGridKeyAsync(gridKey);
+
+            return CreateSuccessResponse(data);
         }
 
 

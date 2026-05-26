@@ -19,5 +19,13 @@ namespace FresherMisa.WebAPI.Controllers
             _gridConfigService = gridConfigService;
         }
 
+        [HttpGet("GridKey/{gridKey}")]
+        public async Task<ActionResult<ServiceResponse>> GetByGridKey(string gridKey)
+        {
+            var response = await _gridConfigService.GetByGridKeyAsync(gridKey);
+
+            return Ok(response);
+        }
+
     }
 }

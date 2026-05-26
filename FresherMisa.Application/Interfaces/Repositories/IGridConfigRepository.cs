@@ -8,5 +8,6 @@ namespace FresherMisa.Application.Interfaces.Repositories
 {
     public interface IGridConfigRepository : IBaseRepository<GridConfig>
     {
+        Task<IEnumerable<GridConfig>> GetByGridKeyAsync(string gridKey);
     }
 }

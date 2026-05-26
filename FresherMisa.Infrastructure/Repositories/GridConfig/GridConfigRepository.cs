@@ -20,5 +20,20 @@ namespace FresherMisa.Infrastructure.Repositories
         {
 
         }
+
+        public async Task<IEnumerable<GridConfig>> GetByGridKeyAsync(string gridKey)
+        {
+            var parameters = new DynamicParameters();
+
+            parameters.Add("@v_GridKey", gridKey);
+
+            var data = await _dbConnection.QueryAsync<GridConfig>(
+                "Proc_GridConfig_GetByGridKey",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return data;
+        }
     }
 }
