@@ -15,8 +15,6 @@ namespace FresherMisa.Entities.GridConfig
 
         public string? Caption { get; set; }
 
-        public string? DataType { get; set; }
-
         public int? Width { get; set; }
 
         public bool? Visible { get; set; }
@@ -25,11 +23,7 @@ namespace FresherMisa.Entities.GridConfig
 
         public string? FixedPosition { get; set; }
 
-        public bool? AllowHiding { get; set; }
-
         public bool? AllowSorting { get; set; }
-
-        public bool? AllowFiltering { get; set; }
 
         public int? SortOrder { get; set; }
 
