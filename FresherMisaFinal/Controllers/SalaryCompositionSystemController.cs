@@ -19,5 +19,11 @@ namespace FresherMisa.WebAPI.Controllers
             _salaryCompositionSystemService = salaryCompositionSystemService;
         }
 
+        [HttpPost("filter")]
+        public async Task<ActionResult<ServiceResponse>> Filter([FromBody] SalaryCompositionSystemFilterRequest request)
+        {
+            var response = await _salaryCompositionSystemService.FilterAsync(request);
+            return Ok(response);
+        }
     }
 }

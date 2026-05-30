@@ -4,10 +4,6 @@ using System.Text;
 
 namespace FresherMisa.Entities
 {
-    /// <summary>
-    /// Attribute đánh dấu một property là bắt buộc (custom required attribute dùng trong BaseService.Validate).
-    /// Gắn lên property trong entity khi muốn kiểm tra bắt buộc nhập.
-    /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
     public class IRequired : Attribute
     {

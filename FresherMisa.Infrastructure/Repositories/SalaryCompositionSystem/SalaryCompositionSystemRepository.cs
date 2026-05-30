@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using FresherMisa.Application.Extensions;
 using FresherMisa.Application.Interfaces.Repositories;
+using FresherMisa.Entities;
 using FresherMisa.Entities.SalaryCompositionSystem;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -19,6 +20,34 @@ namespace FresherMisa.Infrastructure.Repositories
         public SalaryCompositionSystemRepository(IConfiguration configuration) : base(configuration)
         {
 
+        }
+
+        public async Task<PagingResponse<SalaryCompositionSystem>> FilterAsync(SalaryCompositionSystemFilterRequest request)
+        {
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@v_pageIndex", request.PageIndex);
+            parameters.Add("@v_pageSize", request.PageSize);
+            parameters.Add("@v_search", request.Search ?? string.Empty);
+            parameters.Add("@v_sort", request.Sort ?? string.Empty);
+            parameters.Add("@v_SalaryCompositionTypeID", request.SalaryCompositionTypeID?.ToString());
+
+            using var reader = await _dbConnection.QueryMultipleAsync(
+                "Proc_SalaryCompositionSystem_Filter",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            var data = (await reader.ReadAsync<SalaryCompositionSystem>()).ToList();
+            var total = await reader.ReadFirstAsync<long>();
+
+            return new PagingResponse<SalaryCompositionSystem>
+            {
+                Total = total,
+                PageIndex = request.PageIndex,
+                PageSize = request.PageSize,
+                Data = data
+            };
         }
     }
 }

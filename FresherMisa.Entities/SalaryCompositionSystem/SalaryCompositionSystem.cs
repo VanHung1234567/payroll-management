@@ -1,4 +1,5 @@
-﻿using FresherMisa.Entities.Extensions;
+﻿using FresherMisa.Entities.Enums;
+using FresherMisa.Entities.Extensions;
 using System.ComponentModel.DataAnnotations;
 
 namespace FresherMisa.Entities.SalaryCompositionSystem
@@ -17,9 +18,9 @@ namespace FresherMisa.Entities.SalaryCompositionSystem
 
         public string? TypeName { get; set; }
 
-        public int? Nature { get; set; }
+        public Nature? Nature { get; set; }
 
-        public int? TaxType { get; set; }
+        public TaxType? TaxType { get; set; }
 
         public bool? IsTaxReduction { get; set; }
 
@@ -27,12 +28,12 @@ namespace FresherMisa.Entities.SalaryCompositionSystem
 
         public bool? AllowOverNorm { get; set; }
 
-        public int? ValueType { get; set; }
+        public SalaryValueType? ValueType { get; set; }
 
         public string? ValueFormula { get; set; }
 
         public string? Description { get; set; }
 
-        public int? PayslipDisplayType { get; set; }
+        public PayslipDisplayType? PayslipDisplayType { get; set; }
     }
 }

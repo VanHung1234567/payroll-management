@@ -1,8 +1,9 @@
 ﻿using FresherMisa.Application.Interfaces;
-using FresherMisa.Application.Services;
 using FresherMisa.Application.Interfaces.Repositories;
 using FresherMisa.Application.Interfaces.Services;
+using FresherMisa.Application.Services;
 using FresherMisa.Entities;
+using FresherMisa.Entities.Enums;
 using FresherMisa.Entities.SalaryComposition;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,35 @@ namespace FresherMisa.Application.Services
             _salaryCompositionRepository = salaryCompositionRepository;
         }
 
+        public async Task<ServiceResponse> FilterAsync(SalaryCompositionFilterRequest request)
+        {
+            var response = await _salaryCompositionRepository.FilterAsync(request);
+
+            return CreateSuccessResponse(response);
+        }
+
+        public async Task<ServiceResponse> GetDetailByIdAsync(Guid salaryCompositionID)
+        {
+            if (salaryCompositionID == Guid.Empty)
+            {
+                return CreateErrorResponse(
+                    ResponseCode.BadRequest,
+                    "Id không hợp lệ"
+                );
+            }
+
+            var data = await _salaryCompositionRepository.GetDetailByIdAsync(salaryCompositionID);
+
+            if (data == null)
+            {
+                return CreateErrorResponse(
+                    ResponseCode.NotFound,
+                    "Không tìm thấy thành phần lương"
+                );
+            }
+
+            return CreateSuccessResponse(data);
+        }
 
         #region OVERRIDE METHODS
         //protected override async Task<bool> ValidateBeforeDeleteAsync(Guid entityId)
@@ -66,10 +96,10 @@ namespace FresherMisa.Application.Services
                 ));
             }
 
-            if (entity.OrganizationID == Guid.Empty)
+            if (string.IsNullOrWhiteSpace(entity.OrganizationIDs))
             {
                 errors.Add(new ValidationError(
-                    "OrganizationID",
+                    "OrganizationIDs",
                     "Đơn vị áp dụng không được để trống"
                 ));
             }

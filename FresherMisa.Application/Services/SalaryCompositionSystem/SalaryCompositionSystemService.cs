@@ -23,6 +23,12 @@ namespace FresherMisa.Application.Services
             _salaryCompositionSystemRepository = salaryCompositionSystemRepository;
         }
 
+        public async Task<ServiceResponse> FilterAsync(SalaryCompositionSystemFilterRequest request)
+        {
+            var response = await _salaryCompositionSystemRepository.FilterAsync(request);
+            return CreateSuccessResponse(response);
+        }
+
 
         #region OVERRIDE METHODS
         protected override List<ValidationError> ValidateCustom(SalaryCompositionSystem entity)
