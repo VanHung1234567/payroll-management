@@ -12,5 +12,9 @@ namespace FresherMisa.Application.Interfaces.Repositories
         Task<PagingResponse<SalaryComposition>> FilterAsync(SalaryCompositionFilterRequest request);
 
         Task<SalaryComposition?> GetDetailByIdAsync(Guid salaryCompositionID);
+
+        Task<int> BulkUpdateStatusAsync(string ids, int status);
+
+        Task<int> BulkDeleteAsync(string ids);
     }
 }

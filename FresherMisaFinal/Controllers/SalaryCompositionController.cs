@@ -27,7 +27,7 @@ namespace FresherMisa.WebAPI.Controllers
             return Ok(response);
         }
 
-        [HttpGet("{id}/detail")]
+        [HttpGet("detail/{id}")]
         public async Task<ActionResult<ServiceResponse>> GetDetailById(Guid id)
         {
             var response = await _salaryCompositionService.GetDetailByIdAsync(id);
@@ -44,14 +44,14 @@ namespace FresherMisa.WebAPI.Controllers
                 {
             new { Value = 1, Label = "Đang theo dõi" },
             new { Value = 0, Label = "Ngừng theo dõi" }
-        },
+                },
 
                 Natures = new[]
                 {
             new { Value = 1, Label = "Thu nhập" },
             new { Value = 2, Label = "Khấu trừ" },
             new { Value = 3, Label = "Khác" },
-        },
+                },
 
                 ValueTypes = new[]
                 {
@@ -61,10 +61,26 @@ namespace FresherMisa.WebAPI.Controllers
             new { Value = 4, Label = "Chữ" },
             new { Value = 5, Label = "Ngày" },
 
-        },
+                },
 
                 
             });
+        }
+
+        [HttpPatch("update-bulk-status")]
+        public async Task<ActionResult<ServiceResponse>> BulkUpdateStatus([FromBody] BulkUpdateSalaryStatusRequest request)
+        {
+            var response = await _salaryCompositionService.BulkUpdateStatusAsync(request);
+
+            return Ok(response);
+        }
+
+        [HttpPost("bulk-delete")]
+        public async Task<ActionResult<ServiceResponse>> BulkDelete([FromBody] BulkDeleteSalaryCompositionRequest request)
+        {
+            var response = await _salaryCompositionService.BulkDeleteAsync(request);
+
+            return Ok(response);
         }
 
     }

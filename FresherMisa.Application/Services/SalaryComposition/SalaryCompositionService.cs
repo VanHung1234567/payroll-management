@@ -53,15 +53,79 @@ namespace FresherMisa.Application.Services
             return CreateSuccessResponse(data);
         }
 
-        #region OVERRIDE METHODS
-        //protected override async Task<bool> ValidateBeforeDeleteAsync(Guid entityId)
-        //{
-        //    return Task.FromResult(true);
-        //}
+        public async Task<ServiceResponse> BulkUpdateStatusAsync(
+    BulkUpdateSalaryStatusRequest request)
+        {
+            if (request == null || request.Ids == null || request.Ids.Count == 0)
+            {
+                return CreateErrorResponse(
+                    ResponseCode.BadRequest,
+                    "Vui lòng chọn ít nhất một bản ghi"
+                );
+            }
 
-        /// <summary>
-        /// Validate tùy chỉnh cho SalaryComposition
-        /// </summary>
+            if (request.Status != 0 && request.Status != 1)
+            {
+                return CreateErrorResponse(
+                    ResponseCode.BadRequest,
+                    "Trạng thái không hợp lệ"
+                );
+            }
+
+            var ids = string.Join(";", request.Ids);
+
+            var rowAffects = await _salaryCompositionRepository
+                .BulkUpdateStatusAsync(ids, request.Status);
+
+            return CreateSuccessResponse(new
+            {
+                Updated = rowAffects,
+                TotalSelected = request.Ids.Count
+            });
+        }
+
+        public async Task<ServiceResponse> BulkDeleteAsync(
+    BulkDeleteSalaryCompositionRequest request)
+        {
+            if (request == null || request.Ids == null || request.Ids.Count == 0)
+            {
+                return CreateErrorResponse(
+                    ResponseCode.BadRequest,
+                    "Vui lòng chọn ít nhất một bản ghi"
+                );
+            }
+
+            var ids = string.Join(";", request.Ids);
+
+            var rowAffects = await _salaryCompositionRepository.BulkDeleteAsync(ids);
+
+            return CreateSuccessResponse(new
+            {
+                Deleted = rowAffects,
+                Skipped = request.Ids.Count - rowAffects,
+                TotalSelected = request.Ids.Count
+            });
+        }
+
+        #region OVERRIDE METHODS
+        protected override async Task<bool> ValidateBeforeDeleteAsync(Guid entityId)
+        {
+            var entity = await _salaryCompositionRepository.GetDetailByIdAsync(entityId);
+
+            if (entity == null)
+            {
+                return false;
+            }
+
+            // CreatedSource = 2: Mặc định / từ hệ thống => không cho xóa
+            if (entity.CreatedSource == CreatedSource.System)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         protected override List<ValidationError> ValidateCustom(SalaryComposition entity)
         {
             var errors = new List<ValidationError>();

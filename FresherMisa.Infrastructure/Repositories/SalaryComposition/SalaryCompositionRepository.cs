@@ -51,6 +51,24 @@ namespace FresherMisa.Infrastructure.Repositories
             };
         }
 
+        public async Task<int> BulkUpdateStatusAsync(string ids, int status)
+        {
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@v_Ids", ids);
+            parameters.Add("@v_Status", status);
+
+            var rowAffects = await _dbConnection.ExecuteAsync(
+                "Proc_BulkUpdateSalaryCompositionStatus",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return rowAffects;
+        }
+
+
+
         public async Task<SalaryComposition?> GetDetailByIdAsync(Guid salaryCompositionID)
         {
 
@@ -64,6 +82,21 @@ namespace FresherMisa.Infrastructure.Repositories
             );
 
             return data;
+        }
+
+        public async Task<int> BulkDeleteAsync(string ids)
+        {
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@v_Ids", ids);
+
+            var rowAffects = await _dbConnection.ExecuteAsync(
+                "Proc_BulkDeleteSalaryComposition",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return rowAffects;
         }
     }
 }
