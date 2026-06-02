@@ -13,7 +13,7 @@ namespace FresherMisa.Application.Services
     /// Service dùng chung
     /// </summary>
     /// <typeparam name="TEntity">Loại thực thể</typeparam>
-    /// CREATED BY: DVHAI (11/07/2026)
+    /// CREATED BY: VVHung (29/05/2026)
     public class BaseService<TEntity> : IBaseService<TEntity> where TEntity : BaseModel
     {
         #region Declare
@@ -58,7 +58,7 @@ namespace FresherMisa.Application.Services
         /// Lấy tất cả bản ghi
         /// </summary>
         /// <returns>Danh sách bản ghi</returns>
-        /// CREATED BY: DVHAI 11/07/2026
+        /// CREATED BY: VVHung (29/05/2026)
         public async Task<ServiceResponse> GetEntitiesAsync()
         {
             var entities = await _baseRepository.GetEntitiesAsync();
@@ -70,7 +70,7 @@ namespace FresherMisa.Application.Services
         /// </summary>
         /// <param name="entityId">Id của bản ghi</param>
         /// <returns>Bản ghi duy nhất</returns>
-        /// CREATED BY: DVHAI (11/07/2026)
+        /// CREATED BY: VVHung (29/05/2026)
         public async Task<ServiceResponse> GetEntityByIDAsync(Guid entityId)
         {
             if (entityId == Guid.Empty)
@@ -89,7 +89,7 @@ namespace FresherMisa.Application.Services
         /// </summary>
         /// <param name="entityId">Id của bản ghi</param>
         /// <returns>Số dòng bị xóa</returns>
-        /// CREATED BY: DVHAI (07/07/2026)
+        /// CREATED BY: VVHung (29/05/2026)
         public async Task<ServiceResponse> DeleteByIDAsync(Guid entityId)
         {
             if (entityId == Guid.Empty)
@@ -122,7 +122,7 @@ namespace FresherMisa.Application.Services
         /// </summary>
         /// <param name="entity">Thực thể</param>
         /// <returns>Danh sách lỗi validate</returns>
-        /// CREATED BY: DVHAI (07/07/2021)
+        /// CREATED BY: VVHung (29/05/2026)
         private List<ValidationError> Validate(TEntity entity)
         {
             var errors = new List<ValidationError>();
@@ -154,7 +154,7 @@ namespace FresherMisa.Application.Services
         /// <param name="entity">Thực thể</param>
         /// <param name="propertyInfo">Thuộc tính của thực thể</param>
         /// <returns>Lỗi validate hoặc null nếu hợp lệ</returns>
-        /// CREATED BY: DVHAI (07/07/2021)
+        /// CREATED BY: VVHung (29/05/2026)
         private ValidationError? ValidateRequired(TEntity entity, PropertyInfo propertyInfo)
         {
             //1. Tên trường
@@ -179,7 +179,7 @@ namespace FresherMisa.Application.Services
         /// </summary>
         /// <param name="entity">Thực thể</param>
         /// <returns>Danh sách lỗi tùy chỉnh</returns>
-        /// CREATED BY: DVHAI (07/07/2021)
+        /// CREATED BY: VVHung (29/05/2026)
         protected virtual List<ValidationError> ValidateCustom(TEntity entity)
         {
             return new List<ValidationError>();
@@ -191,7 +191,7 @@ namespace FresherMisa.Application.Services
         /// </summary>
         /// <param name="entity">Thực thể cần thêm</param>
         /// <returns>ServiceResponse chứa kết quả</returns>
-        /// CREATED BY: DVHAI (11/07/2021)
+        /// CREATED BY: VVHung (29/05/2026)
         public async Task<ServiceResponse> InsertAsync(TEntity entity)
         {
             entity.State = ModelSate.Add;
@@ -221,7 +221,7 @@ namespace FresherMisa.Application.Services
         /// <param name="entityId">Id bản ghi</param>
         /// <param name="entity">Thông tin bản ghi</param>
         /// <returns>ServiceResponse chứa kết quả</returns>
-        /// CREATED BY: DVHAI (11/07/2021)
+        /// CREATED BY: VVHung (29/05/2026)
         public async Task<ServiceResponse> UpdateAsync(Guid entityId, TEntity entity)
         {
             if (entityId == Guid.Empty)
@@ -253,14 +253,14 @@ namespace FresherMisa.Application.Services
             );
         }
 
-       
+
 
         /// <summary>
         /// Lấy danh sách thực thể paging
         /// </summary>
         /// <param name="pagingRequest">Thông tin phân trang</param>
         /// <returns>Danh sách thực thể phân trang</returns>
-        /// CREATED BY: DVHAI (07/07/2026)
+        /// CREATED BY: VVHung (29/05/2026)
         public async Task<ServiceResponse> GetFilterPagingAsync(PagingRequest pagingRequest)
         {
             var fields = string.IsNullOrEmpty(pagingRequest.SearchFields)

@@ -12,7 +12,7 @@ namespace FresherMisa.Entities
 
         public string? Search { get; set; }
 
-        public string? Sort { get; set; } //vd: +ModifiedDate
+        public string? Sort { get; set; }
 
         /// <summary>
         /// DepartmentCode;DepartmentName

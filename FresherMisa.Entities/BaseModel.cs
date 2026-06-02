@@ -10,11 +10,6 @@ namespace FresherMisa.Entities
 
     }
 
-    /// <summary>
-    /// Lớp model cơ sở (BaseModel) mà tất cả entity sẽ kế thừa.
-    /// Chứa các thuộc tính phổ biến như CreatedBy, CreateDate, trạng thái thao tác (State) và cờ IsDeleted.
-    /// Các thuộc tính này không bắt buộc phải ánh xạ vào database (tuỳ thiết kế), nhưng được dùng trong business logic chung.
-    /// </summary>
     public class BaseModel
     {
         /// <summary>
@@ -44,7 +39,7 @@ namespace FresherMisa.Entities
         public ModelSate State { get; set; }
 
         /// <summary>
-        /// Cờ xóa mềm. Nếu true thì bản ghi được xem là đã bị xóa (IsDeleted = true).
+        /// Có xóa mềm. Nếu true thì bản ghi được xem là đã bị xóa (IsDeleted = true).
         /// Repository có thể dùng cờ này để lọc kết quả trả về.
         /// </summary>
         public bool IsDeleted { get; set; }

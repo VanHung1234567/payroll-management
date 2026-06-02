@@ -84,8 +84,7 @@ namespace FresherMisa.Application.Services
             });
         }
 
-        public async Task<ServiceResponse> BulkDeleteAsync(
-    BulkDeleteSalaryCompositionRequest request)
+        public async Task<ServiceResponse> BulkDeleteAsync(BulkDeleteSalaryCompositionRequest request)
         {
             if (request == null || request.Ids == null || request.Ids.Count == 0)
             {
@@ -104,6 +103,30 @@ namespace FresherMisa.Application.Services
                 Deleted = rowAffects,
                 Skipped = request.Ids.Count - rowAffects,
                 TotalSelected = request.Ids.Count
+            });
+        }
+
+        public async Task<ServiceResponse> CopyFromSystemAsync(CopySystemToSalaryRequest request)
+        {
+            if (request == null ||
+                request.SalaryCompositionSystemIDs == null ||
+                request.SalaryCompositionSystemIDs.Count == 0)
+            {
+                return CreateErrorResponse(
+                    ResponseCode.BadRequest,
+                    "Vui lòng chọn ít nhất một thành phần hệ thống"
+                );
+            }
+
+            var systemIds = string.Join(";", request.SalaryCompositionSystemIDs);
+
+            var rowAffects = await _salaryCompositionRepository
+                .CopyFromSystemAsync(systemIds);
+
+            return CreateSuccessResponse(new
+            {
+                Inserted = rowAffects,
+                TotalSelected = request.SalaryCompositionSystemIDs.Count,
             });
         }
 

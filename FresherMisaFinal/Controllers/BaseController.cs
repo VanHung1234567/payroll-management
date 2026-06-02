@@ -5,10 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FresherMisa.WebAPI.Controllers
 {
-    /// <summary>
-    /// Controller generic dùng chung cho các entity. Cung cấp các endpoint chuẩn: GET list, GET by id, POST, PUT, DELETE.
-    /// Các controller cụ thể sẽ kế thừa BaseController<TEntity> và được inject IBaseService<TEntity>.
-    /// </summary>
     [ApiController]
     [Route("/api/[controller]")]
     public class BaseController<TEntity> : ControllerBase

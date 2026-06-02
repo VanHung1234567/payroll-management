@@ -16,5 +16,7 @@ namespace FresherMisa.Application.Interfaces.Services
         Task<ServiceResponse> BulkUpdateStatusAsync(BulkUpdateSalaryStatusRequest request);
 
         Task<ServiceResponse> BulkDeleteAsync(BulkDeleteSalaryCompositionRequest request);
+
+        Task<ServiceResponse> CopyFromSystemAsync(CopySystemToSalaryRequest request);
     }
 }

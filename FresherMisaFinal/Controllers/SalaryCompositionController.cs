@@ -83,5 +83,13 @@ namespace FresherMisa.WebAPI.Controllers
             return Ok(response);
         }
 
+        [HttpPost("copy-from-system")]
+        public async Task<ActionResult<ServiceResponse>> CopyFromSystem([FromBody] CopySystemToSalaryRequest request)
+        {
+            var response = await _salaryCompositionService.CopyFromSystemAsync(request);
+
+            return Ok(response);
+        }
+
     }
 }

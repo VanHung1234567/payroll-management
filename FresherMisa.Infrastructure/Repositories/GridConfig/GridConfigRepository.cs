@@ -13,7 +13,7 @@ namespace FresherMisa.Infrastructure.Repositories
     /// <summary>
     /// Repository for Department entity
     /// </summary>
-    /// Created By: dvhai (09/04/2026)
+    /// CREATED BY: VVHung (29/05/2026)
     public class GridConfigRepository : BaseRepository<GridConfig>, IGridConfigRepository
     {
         public GridConfigRepository(IConfiguration configuration) : base(configuration)

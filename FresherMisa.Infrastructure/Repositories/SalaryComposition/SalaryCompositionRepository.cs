@@ -98,5 +98,20 @@ namespace FresherMisa.Infrastructure.Repositories
 
             return rowAffects;
         }
+
+        public async Task<int> CopyFromSystemAsync(string systemIds)
+        {
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@v_SystemIDs", systemIds);
+
+            var inserted = await _dbConnection.ExecuteScalarAsync<int>(
+                "Proc_CopySalaryCompositionSystemToSalaryComposition",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return inserted;
+        }
     }
 }

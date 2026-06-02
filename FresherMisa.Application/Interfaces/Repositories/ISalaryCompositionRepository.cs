@@ -16,5 +16,7 @@ namespace FresherMisa.Application.Interfaces.Repositories
         Task<int> BulkUpdateStatusAsync(string ids, int status);
 
         Task<int> BulkDeleteAsync(string ids);
+
+        Task<int> CopyFromSystemAsync(string systemIds);
     }
 }
