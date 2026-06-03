@@ -19,6 +19,12 @@ namespace FresherMisa.WebAPI.Controllers
             _salaryCompositionSystemService = salaryCompositionSystemService;
         }
 
+        /// <summary>
+        /// Lấy danh sách thành phần lương hệ thống theo điều kiện lọc và phân trang
+        /// POST /api/SalaryCompositionSystem/filter
+        /// Trả về ServiceResponse chứa danh sách dữ liệu và tổng số bản ghi
+        /// </summary>
+        /// CREATED BY: VVHung (03/06/2026)
         [HttpPost("filter")]
         public async Task<ActionResult<ServiceResponse>> Filter([FromBody] SalaryCompositionSystemFilterRequest request)
         {

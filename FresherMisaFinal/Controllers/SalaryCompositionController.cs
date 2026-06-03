@@ -19,6 +19,12 @@ namespace FresherMisa.WebAPI.Controllers
             _salaryCompositionService = salaryCompositionService;
         }
 
+        /// <summary>
+        /// Lấy danh sách thành phần lương theo điều kiện lọc và phân trang
+        /// POST /api/SalaryComposition/filter
+        /// Trả về ServiceResponse chứa danh sách dữ liệu và tổng số bản ghi
+        /// </summary>
+        /// CREATED BY: VVHung (03/06/2026)
         [HttpPost("filter")]
         public async Task<ActionResult<ServiceResponse>> Filter([FromBody] SalaryCompositionFilterRequest request)
         {
@@ -27,6 +33,12 @@ namespace FresherMisa.WebAPI.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Lấy thông tin chi tiết thành phần lương
+        /// GET /api/SalaryComposition/detail/{id}
+        /// Trả về ServiceResponse chứa thông tin chi tiết thành phần lương
+        /// </summary>
+        /// CREATED BY: VVHung (03/06/2026)
         [HttpGet("detail/{id}")]
         public async Task<ActionResult<ServiceResponse>> GetDetailById(Guid id)
         {
@@ -35,6 +47,12 @@ namespace FresherMisa.WebAPI.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Cập nhật trạng thái hàng loạt thành phần lương
+        /// PATCH /api/SalaryComposition/update-bulk-status
+        /// Trả về ServiceResponse chứa kết quả cập nhật
+        /// </summary>
+        /// CREATED BY: VVHung (03/06/2026)
         [HttpPatch("update-bulk-status")]
         public async Task<ActionResult<ServiceResponse>> BulkUpdateStatus([FromBody] BulkUpdateSalaryStatusRequest request)
         {
@@ -43,6 +61,12 @@ namespace FresherMisa.WebAPI.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Xóa hàng loạt thành phần lương
+        /// POST /api/SalaryComposition/bulk-delete
+        /// Trả về ServiceResponse chứa kết quả xóa dữ liệu
+        /// </summary>
+        /// CREATED BY: VVHung (03/06/2026
         [HttpPost("bulk-delete")]
         public async Task<ActionResult<ServiceResponse>> BulkDelete([FromBody] BulkDeleteSalaryCompositionRequest request)
         {
@@ -51,6 +75,12 @@ namespace FresherMisa.WebAPI.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Đưa các thành phần lương hệ thống vào danh sách sử dụng
+        /// POST /api/SalaryComposition/copy-from-system
+        /// Trả về ServiceResponse chứa kết quả thêm mới
+        /// </summary>
+        /// CREATED BY: VVHung (03/06/2026)
         [HttpPost("copy-from-system")]
         public async Task<ActionResult<ServiceResponse>> CopyFromSystem([FromBody] CopySystemToSalaryRequest request)
         {

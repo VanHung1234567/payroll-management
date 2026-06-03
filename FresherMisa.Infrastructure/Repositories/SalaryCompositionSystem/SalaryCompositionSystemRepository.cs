@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using FresherMisa.Application.Extensions;
 using FresherMisa.Application.Interfaces.Repositories;
 using FresherMisa.Entities;
 using FresherMisa.Entities.SalaryCompositionSystem;
@@ -12,9 +11,10 @@ using System.Text;
 namespace FresherMisa.Infrastructure.Repositories
 {
     /// <summary>
-    /// Repository for Department entity
+    /// Repository for SalaryCompositionSystem entity
     /// </summary>
-    /// Created By: dvhai (09/04/2026)
+    /// CREATED BY: VVHung (29/05/2026)
+
     public class SalaryCompositionSystemRepository : BaseRepository<SalaryCompositionSystem>, ISalaryCompositionSystemRepository
     {
         public SalaryCompositionSystemRepository(IConfiguration configuration) : base(configuration)
@@ -22,6 +22,18 @@ namespace FresherMisa.Infrastructure.Repositories
 
         }
 
+        /// <summary>
+        /// Lấy danh sách thành phần lương hệ thống theo điều kiện lọc và phân trang
+        /// </summary>
+        /// <param name="request">
+        /// pageSize: Số bản ghi mỗi trang
+        /// pageIndex: Chỉ số trang
+        /// search: Từ khóa tìm kiếm
+        /// salaryCompositionType: Loại thành phần lương
+        /// sort: Sắp xếp theo
+        /// </param>
+        /// <returns>Tổng số bản ghi và danh sách dữ liệu</returns>
+        /// CREATED BY: VVHung (03/06/2026)
         public async Task<PagingResponse<SalaryCompositionSystem>> FilterAsync(SalaryCompositionSystemFilterRequest request)
         {
 

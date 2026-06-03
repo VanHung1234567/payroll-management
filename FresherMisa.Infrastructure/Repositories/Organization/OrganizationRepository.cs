@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using FresherMisa.Application.Extensions;
 using FresherMisa.Application.Interfaces.Repositories;
 using FresherMisa.Entities.Organization;
 using Microsoft.Extensions.Configuration;
@@ -11,9 +10,10 @@ using System.Text;
 namespace FresherMisa.Infrastructure.Repositories
 {
     /// <summary>
-    /// Repository for Department entity
+    /// Repository for Organization entity
     /// </summary>
-    /// Created By: dvhai (09/04/2026)
+    /// CREATED BY: VVHung (29/05/2026)
+
     public class OrganizationRepository : BaseRepository<Organization>, IOrganizationRepository
     {
         public OrganizationRepository(IConfiguration configuration) : base(configuration)

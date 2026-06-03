@@ -23,6 +23,18 @@ namespace FresherMisa.Application.Services
             _salaryCompositionSystemRepository = salaryCompositionSystemRepository;
         }
 
+        /// <summary>
+        /// Lấy danh sách thành phần lương hệ thống theo điều kiện lọc và phân trang
+        /// </summary>
+        /// <param name="request">
+        /// pageSize: Số bản ghi mỗi trang
+        /// pageIndex: Chỉ số trang
+        /// search: Từ khóa tìm kiếm
+        /// salaryCompositionType: Loại thành phần
+        /// sort: Sắp xếp theo
+        /// </param>
+        /// <returns>Tổng số bản ghi và danh sách dữ liệu</returns>
+        /// CREATED BY: VVHung (03/06/2026)
         public async Task<ServiceResponse> FilterAsync(SalaryCompositionSystemFilterRequest request)
         {
             var response = await _salaryCompositionSystemRepository.FilterAsync(request);
@@ -31,10 +43,7 @@ namespace FresherMisa.Application.Services
 
 
         #region OVERRIDE METHODS
-        protected override List<ValidationError> ValidateCustom(SalaryCompositionSystem entity)
-        {
-            return new List<ValidationError>();
-        }
+ 
         #endregion OVERRIDE METHODS
     }
 }

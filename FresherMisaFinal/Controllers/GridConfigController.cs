@@ -19,6 +19,12 @@ namespace FresherMisa.WebAPI.Controllers
             _gridConfigService = gridConfigService;
         }
 
+        /// <summary>
+        /// Lấy danh sách cấu hình cột theo GridKey
+        /// GET /api/GridConfig/GridKey/{gridKey}
+        /// Trả về ServiceResponse chứa danh sách cấu hình cột
+        /// </summary>
+        /// CREATED BY: VVHung (03/06/2026)
         [HttpGet("GridKey/{gridKey}")]
         public async Task<ActionResult<ServiceResponse>> GetByGridKey(string gridKey)
         {

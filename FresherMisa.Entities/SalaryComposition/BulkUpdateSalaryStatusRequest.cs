@@ -6,10 +6,15 @@ namespace FresherMisa.Entities.SalaryComposition
 {
     public class BulkUpdateSalaryStatusRequest
     {
+        /// <summary>
+        /// Danh sách ID thành phần lương.
+        /// </summary>
         public List<Guid> Ids { get; set; } = new();
 
         /// <summary>
-        /// 1 - Đang theo dõi, 0 - Ngừng theo dõi
+        /// Trạng thái cần cập nhật.
+        /// 1 - Đang theo dõi.
+        /// 0 - Ngừng theo dõi.
         /// </summary>
         public int Status { get; set; }
     }

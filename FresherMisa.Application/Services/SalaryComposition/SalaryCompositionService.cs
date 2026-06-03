@@ -23,6 +23,19 @@ namespace FresherMisa.Application.Services
             _salaryCompositionRepository = salaryCompositionRepository;
         }
 
+        /// <summary>
+        /// Lấy danh sách thành phần lương theo điều kiện lọc và phân trang
+        /// </summary>
+        /// <param name="request">
+        /// pageSize: Số bản ghi mỗi trang
+        /// pageIndex: Chỉ số trang
+        /// search: Từ khóa tìm kiếm
+        /// status: Trạng thái theo dõi
+        /// organizationIDs: Danh sách ID đơn vị áp dụng
+        /// sort: Sắp xếp theo
+        /// </param>
+        /// <returns>Tổng số bản ghi và danh sách dữ liệu</returns>
+        /// CREATED BY: VVHung (03/06/2026)
         public async Task<ServiceResponse> FilterAsync(SalaryCompositionFilterRequest request)
         {
             var response = await _salaryCompositionRepository.FilterAsync(request);
@@ -30,6 +43,12 @@ namespace FresherMisa.Application.Services
             return CreateSuccessResponse(response);
         }
 
+        /// <summary>
+        /// Lấy thông tin chi tiết thành phần lương
+        /// </summary>
+        /// <param name="salaryCompositionID">ID thành phần lương</param>
+        /// <returns>Thông tin chi tiết thành phần lương</returns>
+        /// CREATED BY: VVHung (03/06/2026)
         public async Task<ServiceResponse> GetDetailByIdAsync(Guid salaryCompositionID)
         {
             if (salaryCompositionID == Guid.Empty)
@@ -53,8 +72,18 @@ namespace FresherMisa.Application.Services
             return CreateSuccessResponse(data);
         }
 
-        public async Task<ServiceResponse> BulkUpdateStatusAsync(
-    BulkUpdateSalaryStatusRequest request)
+        /// <summary>
+        /// Cập nhật trạng thái hàng loạt thành phần lương
+        /// </summary>
+        /// <param name="request">
+        /// ids: Danh sách ID thành phần lương
+        /// status:
+        ///     1 - Đang theo dõi
+        ///     0 - Ngừng theo dõi
+        /// </param>
+        /// <returns>Kết quả cập nhật trạng thái</returns>
+        /// CREATED BY: VVHung (03/06/2026)
+        public async Task<ServiceResponse> BulkUpdateStatusAsync(BulkUpdateSalaryStatusRequest request)
         {
             if (request == null || request.Ids == null || request.Ids.Count == 0)
             {
@@ -84,6 +113,14 @@ namespace FresherMisa.Application.Services
             });
         }
 
+        /// <summary>
+        /// Xóa hàng loạt thành phần lương
+        /// </summary>
+        /// <param name="request">
+        /// ids: Danh sách ID thành phần lương cần xóa
+        /// </param>
+        /// <returns>Kết quả xóa dữ liệu</returns>
+        /// CREATED BY: VVHung (03/06/2026)
         public async Task<ServiceResponse> BulkDeleteAsync(BulkDeleteSalaryCompositionRequest request)
         {
             if (request == null || request.Ids == null || request.Ids.Count == 0)
@@ -106,6 +143,15 @@ namespace FresherMisa.Application.Services
             });
         }
 
+        /// <summary>
+        /// Đưa các thành phần lương hệ thống vào danh sách sử dụng
+        /// </summary>
+        /// <param name="request">
+        /// salaryCompositionSystemIDs:
+        ///     Danh sách ID thành phần lương hệ thống
+        /// </param>
+        /// <returns>Kết quả thêm mới dữ liệu</returns>
+        /// CREATED BY: VVHung (03/06/2026)
         public async Task<ServiceResponse> CopyFromSystemAsync(CopySystemToSalaryRequest request)
         {
             if (request == null ||

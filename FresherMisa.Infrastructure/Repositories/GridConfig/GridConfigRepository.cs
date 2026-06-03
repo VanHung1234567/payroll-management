@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using FresherMisa.Application.Extensions;
 using FresherMisa.Application.Interfaces.Repositories;
 using FresherMisa.Entities.GridConfig;
 using Microsoft.Extensions.Configuration;
@@ -11,7 +10,7 @@ using System.Text;
 namespace FresherMisa.Infrastructure.Repositories
 {
     /// <summary>
-    /// Repository for Department entity
+    /// Repository for GridConfig entity
     /// </summary>
     /// CREATED BY: VVHung (29/05/2026)
     public class GridConfigRepository : BaseRepository<GridConfig>, IGridConfigRepository
@@ -21,6 +20,12 @@ namespace FresherMisa.Infrastructure.Repositories
 
         }
 
+        /// <summary>
+        /// Lấy danh sách cấu hình cột theo GridKey
+        /// </summary>
+        /// <param name="gridKey">Mã định danh của grid</param>
+        /// <returns>Danh sách cấu hình cột</returns>
+        /// CREATED BY: VVHung (03/06/2026)
         public async Task<IEnumerable<GridConfig>> GetByGridKeyAsync(string gridKey)
         {
             var parameters = new DynamicParameters();

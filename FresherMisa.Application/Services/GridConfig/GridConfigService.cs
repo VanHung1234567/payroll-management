@@ -23,6 +23,12 @@ namespace FresherMisa.Application.Services
             _gridConfigRepository = gridConfigRepository;
         }
 
+        /// <summary>
+        /// Lấy danh sách cấu hình cột theo GridKey
+        /// </summary>
+        /// <param name="gridKey">Mã định danh của grid</param>
+        /// <returns>Danh sách cấu hình cột</returns>
+        /// CREATED BY: VVHung (29/05/2026)
         public async Task<ServiceResponse> GetByGridKeyAsync(string gridKey)
         {
             if (string.IsNullOrWhiteSpace(gridKey))
@@ -40,10 +46,7 @@ namespace FresherMisa.Application.Services
 
 
         #region OVERRIDE METHODS
-        protected override List<ValidationError> ValidateCustom(GridConfig entity)
-        {
-            return new List<ValidationError>();
-        }
+    
         #endregion OVERRIDE METHODS
     }
 }

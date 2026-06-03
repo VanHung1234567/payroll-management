@@ -25,10 +25,7 @@ namespace FresherMisa.Application.Services
 
 
         #region OVERRIDE METHODS
-        protected override List<ValidationError> ValidateCustom(Organization entity)
-        {
-            return new List<ValidationError>();
-        }
+
         #endregion OVERRIDE METHODS
     }
 }
