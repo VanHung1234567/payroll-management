@@ -266,11 +266,11 @@ namespace FresherMisa.Infrastructure.Repositories
         /// <returns>Tổng số bản ghi và danh sách dữ liệu</returns>
         /// CREATED BY: VVHung (29/05/2026)
         public async Task<PagingResponse<TEntity>> GetFilterPagingAsync(
-    int pageSize,
-    int pageIndex,
-    string search,
-    List<string> searchFields,
-    string sort)
+            int pageSize,
+            int pageIndex,
+            string search,
+            List<string> searchFields,
+            string sort)
         {
             long total = 0;
             var data = Enumerable.Empty<TEntity>();

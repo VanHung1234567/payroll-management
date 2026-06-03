@@ -4,10 +4,6 @@ using System.Text;
 
 namespace FresherMisa.Entities
 {
-    /// <summary>
-    /// Lớp chuẩn để các service/controller trả về kết quả.
-    /// Thống nhất cấu trúc response giữa các layer: IsSuccess, Code (http-like), Data, UserMessage, DevMessage.
-    /// </summary>
     public class ServiceResponse
     {
         /// <summary>

@@ -14,9 +14,7 @@ namespace FresherMisa.Entities.SalaryCompositionSystem
 
         public string? SalaryCompositionName { get; set; }
 
-        public Guid SalaryCompositionTypeID { get; set; }
-
-        public string? TypeName { get; set; }
+        public SalaryCompositionType? SalaryCompositionType { get; set; }
 
         public Nature? Nature { get; set; }
 

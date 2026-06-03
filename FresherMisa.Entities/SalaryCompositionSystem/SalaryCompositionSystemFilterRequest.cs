@@ -1,7 +1,9 @@
-﻿namespace FresherMisa.Entities.SalaryCompositionSystem
+﻿using FresherMisa.Entities.Enums;
+
+namespace FresherMisa.Entities.SalaryCompositionSystem
 {
     public class SalaryCompositionSystemFilterRequest : PagingRequest
     {
-        public Guid? SalaryCompositionTypeID { get; set; }
+        public SalaryCompositionType? SalaryCompositionType { get; set; }
     }
 }

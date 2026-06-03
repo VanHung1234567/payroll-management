@@ -10,19 +10,25 @@ namespace FresherMisa.Entities.SalaryComposition
         [Key]
         public Guid SalaryCompositionID { get; set; }
 
+        [Required(ErrorMessage = "Mã TPL không được để trống")]
+        [MaxLength(255, ErrorMessage = "Mã TPL tối đa 255 ký tự")]
         public string? SalaryCompositionCode { get; set; }
 
+        [Required(ErrorMessage = "Tên TPL không được để trống")]
+        [MaxLength(255, ErrorMessage = "Tên TPL tối đa 255 ký tự")]
         public string? SalaryCompositionName { get; set; }
 
+        [Required(ErrorMessage = "Đơn vị áp dụng không được để trống")]
         public string? OrganizationIDs { get; set; }
 
         public string? OrganizationNames { get; set; }
 
-        public Guid SalaryCompositionTypeID { get; set; }
+        [Required(ErrorMessage = "Loại thành phần không được để trống")]
+        public SalaryCompositionType? SalaryCompositionType { get; set; }
 
-        public string? TypeName { get; set; }
-
+        [Required(ErrorMessage = "Tính chất không được để trống")]
         public Nature? Nature { get; set; }
+
 
         public TaxType? TaxType { get; set; }
 

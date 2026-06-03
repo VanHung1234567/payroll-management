@@ -20,7 +20,6 @@ namespace FresherMisa.Infrastructure
             //base
             services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
             services.AddScoped<ISalaryCompositionRepository, SalaryCompositionRepository>();
-            services.AddScoped<ISalaryCompositionTypeRepository, SalaryCompositionTypeRepository>();
             services.AddScoped<ISalaryCompositionSystemRepository, SalaryCompositionSystemRepository>();
             services.AddScoped<IOrganizationRepository, OrganizationRepository>();
             services.AddScoped<IGridConfigRepository, GridConfigRepository>();
