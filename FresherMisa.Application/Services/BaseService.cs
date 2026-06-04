@@ -118,75 +118,6 @@ namespace FresherMisa.Application.Services
         }
 
         /// <summary>
-        /// Validate tất cả
-        /// </summary>
-        /// <param name="entity">Thực thể</param>
-        /// <returns>Danh sách lỗi validate</returns>
-        /// CREATED BY: VVHung (29/05/2026)
-        private List<ValidationError> Validate(TEntity entity)
-        {
-            var errors = new List<ValidationError>();
-            var properties = GetCachedProperties(entity.GetType());
-
-            foreach (var property in properties)
-            {
-                //1.1 Kiểm tra xem có attribute cần phải validate không
-                if (property.IsDefined(typeof(IRequired), false))
-                {
-                    var error = ValidateRequired(entity, property);
-                    if (error != null)
-                    {
-                        errors.Add(error);
-                    }
-                }
-            }
-
-            //2. Validate tùy chỉnh từng màn hình
-            var customErrors = ValidateCustom(entity);
-            errors.AddRange(customErrors);
-
-            return errors;
-        }
-
-        /// <summary>
-        /// Validate bắt buộc nhập
-        /// </summary>
-        /// <param name="entity">Thực thể</param>
-        /// <param name="propertyInfo">Thuộc tính của thực thể</param>
-        /// <returns>Lỗi validate hoặc null nếu hợp lệ</returns>
-        /// CREATED BY: VVHung (29/05/2026)
-        private ValidationError? ValidateRequired(TEntity entity, PropertyInfo propertyInfo)
-        {
-            //1. Tên trường
-            var propertyName = propertyInfo.Name;
-
-            //2. Giá trị
-            var propertyValue = propertyInfo.GetValue(entity);
-
-            //3. Tên hiển thị
-            var propertyDisplayName = typeof(TEntity).GetColumnDisplayName(propertyName);
-
-            if (propertyValue == null || string.IsNullOrEmpty(propertyValue.ToString()))
-            {
-                return new ValidationError(propertyName, $"Trường {propertyDisplayName} bắt buộc nhập");
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Validate từng màn hình
-        /// </summary>
-        /// <param name="entity">Thực thể</param>
-        /// <returns>Danh sách lỗi tùy chỉnh</returns>
-        /// CREATED BY: VVHung (29/05/2026)
-        protected virtual List<ValidationError> ValidateCustom(TEntity entity)
-        {
-            return new List<ValidationError>();
-        }
-
-
-        /// <summary>
         /// Thêm một thực thể
         /// </summary>
         /// <param name="entity">Thực thể cần thêm</param>
@@ -197,22 +128,8 @@ namespace FresherMisa.Application.Services
             entity.State = ModelSate.Add;
 
             AutoGeneratePrimaryKey(entity);
-
-            //1. Validate tất cả các trường nếu được gắn thẻ
-            var errors = Validate(entity);
-
-            //2. Sử lí lỗi tương ứng
-            if (errors.Count == 0)
-            {
-                var result = await _baseRepository.InsertAsync(entity);
-                return CreateSuccessResponse(result);
-            }
-
-            return CreateErrorResponse(
-                ResponseCode.BadRequest,
-                "Validate thất bại",
-                string.Join("; ", errors.Select(e => e.Message))
-            );
+            var result = await _baseRepository.InsertAsync(entity);
+            return CreateSuccessResponse(result);
         }
 
         /// <summary>
@@ -228,29 +145,12 @@ namespace FresherMisa.Application.Services
             {
                 return CreateErrorResponse(ResponseCode.BadRequest, "Id không hợp lệ");
             }
-
-            //1. Trạng thái
-            entity.State = ModelSate.Update;
-
-            //2. Validate tất cả các trường nếu được gắn thẻ
-            var errors = Validate(entity);
-
-            if (errors.Count == 0)
+            int rowAffects = await _baseRepository.UpdateAsync(entityId, entity);
+            if (rowAffects > 0)
             {
-                int rowAffects = await _baseRepository.UpdateAsync(entityId, entity);
-                if (rowAffects > 0)
-                {
-                    return CreateSuccessResponse(rowAffects);
-                }
-                return CreateErrorResponse(ResponseCode.NotFound, "Không tìm thấy bản ghi để cập nhật");
+                return CreateSuccessResponse(rowAffects);
             }
-
-            //3. Validate fail - trả về BadRequest
-            return CreateErrorResponse(
-                ResponseCode.BadRequest,
-                "Validate thất bại",
-                string.Join("; ", errors.Select(e => e.Message))
-            );
+            return CreateErrorResponse(ResponseCode.NotFound, "Không tìm thấy bản ghi để cập nhật");
         }
 
 

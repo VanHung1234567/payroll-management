@@ -1,9 +1,11 @@
 using FresherMisa.WebAPI.Middlewares;
 using FresherMisa.Application;
 using FresherMisa.Infrastructure;
+using Dapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
+DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

@@ -41,7 +41,7 @@ namespace FresherMisa.Infrastructure.Repositories
             parameters.Add("@v_pageIndex", request.PageIndex);
             parameters.Add("@v_pageSize", request.PageSize);
             parameters.Add("@v_search", request.Search ?? string.Empty);
-            parameters.Add("@v_sort", request.Sort ?? string.Empty);
+            parameters.Add("@v_sort", NormalizeSort(request.Sort));
             parameters.Add("@v_SalaryCompositionType", request.SalaryCompositionType);
 
             using var reader = await _dbConnection.QueryMultipleAsync(

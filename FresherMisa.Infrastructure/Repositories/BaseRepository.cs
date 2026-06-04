@@ -3,8 +3,10 @@ using FresherMisa.Application.Interfaces;
 using FresherMisa.Entities;
 using FresherMisa.Entities.Extensions;
 using Microsoft.Extensions.Configuration;
+using System.ComponentModel.DataAnnotations.Schema;
 using MySqlConnector;
 using System.Data;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 
@@ -86,13 +88,13 @@ namespace FresherMisa.Infrastructure.Repositories
         /// CREATED BY: VVHung (29/05/2026)
         private async Task<IEnumerable<TEntity>> GetEntitiesUsingCommandTextAsync()
         {
-            var query = new StringBuilder($"select * from {_tableName}");
+            var query = new StringBuilder($"select {GetSelectColumns()} from {_tableName}");
             int whereCount = 0;
 
             if (_modelType.GetHasDeletedColumn())
             {
                 whereCount++;
-                query.Append($" where IsDeleted = FALSE");
+                query.Append($" where {ToSnakeCase(nameof(BaseModel.IsDeleted))} = FALSE");
             }
 
             var entities = await _dbConnection.QueryAsync<TEntity>(query.ToString(), commandType: CommandType.Text);
@@ -118,24 +120,28 @@ namespace FresherMisa.Infrastructure.Repositories
         /// <returns></returns>
         private async Task<TEntity> GetEntitieByIdUsingCommandTextAsync(string id)
         {
-            var query = new StringBuilder($"select * from {_tableName}");
+            var query = new StringBuilder($"select {GetSelectColumns()} from {_tableName}");
             int whereCount = 0;
 
-            Func<StringBuilder, bool> AppendWhere = (query) => { if (whereCount == 0) query.Append(" where "); return true; };
+            Func<StringBuilder, bool> AppendWhere = (query) =>
+            {
+                query.Append(whereCount == 0 ? " where " : " and ");
+                return true;
+            };
 
             var primaryKey = _modelType.GetKeyName();
 
             if (primaryKey != null)
             {
                 AppendWhere(query);
-                query.Append($"{primaryKey} = @Id");
+                query.Append($"{ToSnakeCase(primaryKey)} = @Id");
                 whereCount++;
             }
 
             if (_modelType.GetHasDeletedColumn())
             {
                 AppendWhere(query);
-                query.Append("IsDeleted = FALSE");
+                query.Append($"{ToSnakeCase(nameof(BaseModel.IsDeleted))} = FALSE");
                 whereCount++;
             }
 
@@ -283,8 +289,8 @@ namespace FresherMisa.Infrastructure.Repositories
             parameters.Add("@v_pageIndex", pageIndex);
             parameters.Add("@v_pageSize", pageSize);
             parameters.Add("@v_search", search);
-            parameters.Add("@v_sort", sort);
-            parameters.Add("@v_searchFields", JsonSerializer.Serialize(searchFields));
+            parameters.Add("@v_sort", NormalizeSort(sort));
+            parameters.Add("@v_searchFields", JsonSerializer.Serialize(NormalizeFieldNames(searchFields)));
 
             using var reader = await _dbConnection.QueryMultipleAsync(
                 new CommandDefinition(store, parameters, commandType: CommandType.StoredProcedure));
@@ -313,7 +319,7 @@ namespace FresherMisa.Infrastructure.Repositories
             try
             {
                 //1. Duyệt các thuộc tính trên entity và tạo parameters
-                var properties = entity.GetType().GetProperties();
+                var properties = entity.GetType().GetProperties().Where(IsDatabaseColumn);
 
                 foreach (var property in properties)
                 {
@@ -334,6 +340,154 @@ namespace FresherMisa.Infrastructure.Repositories
             }
             //2. Trả về danh sách các parameter
             return parameters;
+        }
+
+        /// <summary>
+        /// Chuẩn hóa chuỗi sắp xếp từ PascalCase sang snake_case
+        /// </summary>
+        /// <param name="sort">
+        /// Chuỗi sắp xếp, hỗ trợ nhiều trường phân tách bởi dấu phẩy.
+        /// Thêm dấu '-' phía trước tên trường để sắp xếp giảm dần.
+        /// </param>
+        /// <returns>Chuỗi sắp xếp đã được chuyển sang snake_case</returns>
+        /// CREATED BY: VVHung (04/06/2026)
+        protected static string NormalizeSort(string? sort)
+        {
+            if (string.IsNullOrWhiteSpace(sort))
+            {
+                return string.Empty;
+            }
+
+            var fields = sort
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(item =>
+                {
+                    var isDescending = item.StartsWith("-");
+                    var fieldName = isDescending ? item[1..] : item;
+                    var normalized = ToSnakeCase(fieldName);
+                    return isDescending ? $"-{normalized}" : normalized;
+                });
+
+            return string.Join(",", fields);
+        }
+
+        /// <summary>
+        /// Chuẩn hóa danh sách tên trường từ PascalCase sang snake_case
+        /// </summary>
+        /// <param name="fieldNames">Danh sách tên trường cần chuẩn hóa</param>
+        /// <returns>Danh sách tên trường đã được chuyển sang snake_case</returns>
+        /// CREATED BY: VVHung (04/06/2026)
+        protected static List<string> NormalizeFieldNames(IEnumerable<string>? fieldNames)
+        {
+            if (fieldNames == null)
+            {
+                return new List<string>();
+            }
+
+            return fieldNames
+                .Where(field => !string.IsNullOrWhiteSpace(field))
+                .Select(field => ToSnakeCase(field.Trim()))
+                .ToList();
+        }
+
+        /// <summary>
+        /// Chuyển tên thuộc tính từ PascalCase hoặc CamelCase sang snake_case
+        /// </summary>
+        /// <param name="value">Tên thuộc tính cần chuyển đổi</param>
+        /// <returns>Chuỗi theo định dạng snake_case</returns>
+        /// CREATED BY: VVHung (04/06/2026)
+        protected static string ToSnakeCase(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return value;
+            }
+
+            value = value
+                .Replace("IDs", "Ids")
+                .Replace("ID", "Id");
+
+            var builder = new StringBuilder(value.Length + 8);
+
+            for (var index = 0; index < value.Length; index++)
+            {
+                var current = value[index];
+
+                if (char.IsUpper(current))
+                {
+                    var hasPrevious = index > 0;
+                    var nextIsLower = index + 1 < value.Length && char.IsLower(value[index + 1]);
+                    var previousIsLowerOrDigit = hasPrevious && (char.IsLower(value[index - 1]) || char.IsDigit(value[index - 1]));
+                    var previousIsUpper = hasPrevious && char.IsUpper(value[index - 1]);
+
+                    if (hasPrevious && (previousIsLowerOrDigit || (previousIsUpper && nextIsLower)))
+                    {
+                        builder.Append('_');
+                    }
+
+                    builder.Append(char.ToLowerInvariant(current));
+                }
+                else
+                {
+                    builder.Append(current);
+                }
+            }
+
+            return builder.ToString();
+        }
+
+        /// <summary>
+        /// Sinh danh sách cột SELECT dựa trên các thuộc tính của thực thể
+        /// </summary>
+        /// <returns>
+        /// Chuỗi danh sách cột theo định dạng:
+        /// column_name AS PropertyName
+        /// </returns>
+        /// CREATED BY: VVHung (04/06/2026)
+        private string GetSelectColumns()
+        {
+            var columns = _modelType
+                .GetProperties()
+                .Where(IsDatabaseColumn)
+                .Select(property => $"{ToSnakeCase(property.Name)} AS {property.Name}");
+
+            return string.Join(", ", columns);
+        }
+
+        /// <summary>
+        /// Kiểm tra thuộc tính có được ánh xạ xuống cơ sở dữ liệu hay không
+        /// </summary>
+        /// <param name="property">Thông tin thuộc tính cần kiểm tra</param>
+        /// <returns>
+        /// True nếu thuộc tính được ánh xạ xuống database,
+        /// ngược lại trả về False
+        /// </returns>
+        /// CREATED BY: VVHung (04/06/2026)
+        private bool IsDatabaseColumn(PropertyInfo property)
+        {
+            if (property.Name == nameof(BaseModel.State))
+            {
+                return false;
+            }
+
+            if (property.IsDefined(typeof(NotMappedAttribute), false))
+            {
+                return false;
+            }
+
+            if (property.Name is nameof(BaseModel.CreatedBy)
+                or nameof(BaseModel.ModifiedBy)
+                or nameof(BaseModel.ModifiedDate))
+            {
+                return false;
+            }
+
+            if (property.Name == nameof(BaseModel.IsDeleted))
+            {
+                return _modelType.GetHasDeletedColumn();
+            }
+
+            return true;
         }
 
         #endregion
