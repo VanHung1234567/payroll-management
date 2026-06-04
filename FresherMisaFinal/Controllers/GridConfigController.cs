@@ -33,5 +33,23 @@ namespace FresherMisa.WebAPI.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Lưu cấu hình cột của grid
+        /// POST /api/GridConfig/save-config
+        /// Trả về ServiceResponse nếu lưu thành công
+        /// </summary>
+        /// <param name="request">Thông tin cấu hình cột</param>
+        /// <returns>Kết quả lưu cấu hình</returns>
+        /// CREATED BY: VVHung (03/06/2026)
+        [HttpPost("save-config")]
+        public async Task<ActionResult<ServiceResponse>> SaveConfig(
+            [FromBody] SaveGridConfigRequest request)
+        {
+            var response =
+                await _gridConfigService.SaveGridConfigAsync(request);
+
+            return Ok(response);
+        }
+
     }
 }

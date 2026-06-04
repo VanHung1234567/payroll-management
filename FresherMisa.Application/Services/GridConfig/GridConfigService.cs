@@ -44,9 +44,34 @@ namespace FresherMisa.Application.Services
             return CreateSuccessResponse(data);
         }
 
+        /// <summary>
+        /// Lưu cấu hình cột của grid
+        /// </summary>
+        /// <param name="request">Thông tin cấu hình cột</param>
+        /// <returns>Kết quả lưu cấu hình</returns>
+        /// CREATED BY: VVHung (03/06/2026)
+        public async Task<ServiceResponse> SaveGridConfigAsync(SaveGridConfigRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.GridKey))
+            {
+                return CreateErrorResponse(
+                    ResponseCode.BadRequest,
+                    "GridKey không được để trống"
+                );
+            }
+
+            var rowAffects =
+                await _gridConfigRepository.SaveGridConfigAsync(request);
+
+            return CreateSuccessResponse(new
+            {
+                Updated = rowAffects
+            });
+        }
+
 
         #region OVERRIDE METHODS
-    
+
         #endregion OVERRIDE METHODS
     }
 }

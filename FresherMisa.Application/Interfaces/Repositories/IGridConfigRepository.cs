@@ -15,5 +15,13 @@ namespace FresherMisa.Application.Interfaces.Repositories
         /// <returns>Danh sách cấu hình cột thuộc grid tương ứng.</returns>
         /// CREATED BY: VVHung (29/05/2026)
         Task<IEnumerable<GridConfig>> GetByGridKeyAsync(string gridKey);
+
+        /// <summary>
+        /// Lưu cấu hình cột của grid
+        /// </summary>
+        /// <param name="request">Thông tin cấu hình cột</param>
+        /// <returns>Số bản ghi bị ảnh hưởng</returns>
+        /// CREATED BY: VVHung (03/06/2026)
+        Task<int> SaveGridConfigAsync(SaveGridConfigRequest request);
     }
 }

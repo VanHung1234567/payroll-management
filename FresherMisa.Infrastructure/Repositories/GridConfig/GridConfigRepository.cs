@@ -2,6 +2,7 @@
 using FresherMisa.Application.Interfaces.Repositories;
 using FresherMisa.Entities.GridConfig;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -39,6 +40,22 @@ namespace FresherMisa.Infrastructure.Repositories
             );
 
             return data;
+        }
+
+        public async Task<int> SaveGridConfigAsync(SaveGridConfigRequest request)
+        {
+            var json = JsonConvert.SerializeObject(request.Columns);
+
+            var parameters = new DynamicParameters();
+
+            parameters.Add("@v_GridKey", request.GridKey);
+            parameters.Add("@v_Columns", json);
+
+            return await _dbConnection.ExecuteAsync(
+                "Proc_GridConfig_Save",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
         }
     }
 }
