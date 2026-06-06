@@ -57,5 +57,14 @@ namespace FresherMisa.Application.Interfaces.Repositories
         /// <returns>Số bản ghi được thêm mới.</returns>
         /// CREATED BY: VVHung (29/05/2026)
         Task<int> CopyFromSystemAsync(string systemIds);
+
+        /// <summary>
+        /// Cập nhật một phần thông tin thành phần lương
+        /// </summary>
+        /// <param name="id">ID thành phần lương</param>
+        /// <param name="request">Thông tin cần cập nhật</param>
+        /// <returns>Số bản ghi bị ảnh hưởng</returns>
+        /// CREATED BY: VVHung (03/06/2026)
+        Task<int> PatchAsync(Guid id, SalaryCompositionPatchRequest request);
     }
 }

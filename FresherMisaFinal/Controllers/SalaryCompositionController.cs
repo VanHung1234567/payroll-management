@@ -89,5 +89,24 @@ namespace FresherMisa.WebAPI.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Cập nhật một phần thông tin thành phần lương
+        /// PATCH /api/{controller}/{id}
+        /// Trả về ServiceResponse nếu cập nhật thành công
+        /// </summary>
+        /// <param name="id">ID thành phần lương</param>
+        /// <param name="request">Thông tin cần cập nhật</param>
+        /// <returns>Kết quả cập nhật</returns>
+        /// CREATED BY: VVHung (03/06/2026)
+        [HttpPatch("{id}")]
+        public async Task<ActionResult<ServiceResponse>> Patch(
+            Guid id,
+            [FromBody] SalaryCompositionPatchRequest request)
+        {
+            var response = await _salaryCompositionService.PatchAsync(id, request);
+
+            return Ok(response);
+        }
+
     }
 }

@@ -11,5 +11,10 @@
         /// Danh sách ID đơn vị áp dụng.
         /// </summary>
         public string? OrganizationIDs { get; set; }
+
+        /// <summary>
+        /// Danh sách điều kiện lọc nâng cao.
+        /// </summary>
+        public List<AdvancedFilterItem> AdvancedFilters { get; set; } = new();
     }
 }

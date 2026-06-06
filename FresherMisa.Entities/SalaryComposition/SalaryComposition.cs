@@ -31,14 +31,12 @@ namespace FresherMisa.Entities.SalaryComposition
         /// <summary>
         /// Danh sách ID đơn vị áp dụng.
         /// </summary>
-        [NotMapped]
         [Required(ErrorMessage = "Đơn vị áp dụng không được để trống")]
         public string? OrganizationIDs { get; set; }
 
         /// <summary>
         /// Danh sách tên đơn vị áp dụng.
         /// </summary>
-        [NotMapped]
         public string? OrganizationNames { get; set; }
 
         /// <summary>

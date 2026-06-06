@@ -3,6 +3,7 @@ using FresherMisa.Application.Interfaces.Repositories;
 using FresherMisa.Entities;
 using FresherMisa.Entities.SalaryComposition;
 using Microsoft.Extensions.Configuration;
+using System.Text.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -33,17 +34,18 @@ namespace FresherMisa.Infrastructure.Repositories
         /// </param>
         /// <returns>Tổng số bản ghi và danh sách dữ liệu</returns>
         /// CREATED BY: VVHung (03/06/2026)
-        public async Task<PagingResponse<SalaryComposition>> FilterAsync(SalaryCompositionFilterRequest request)
+        public async Task<PagingResponse<SalaryComposition>> FilterAsync(
+    SalaryCompositionFilterRequest request)
         {
-
             var parameters = new DynamicParameters();
 
             parameters.Add("@v_pageIndex", request.PageIndex);
             parameters.Add("@v_pageSize", request.PageSize);
             parameters.Add("@v_search", request.Search ?? string.Empty);
-            parameters.Add("@v_sort", NormalizeSort(request.Sort));
+            parameters.Add("@v_sort", request.Sort ?? string.Empty);
             parameters.Add("@v_status", request.Status);
             parameters.Add("@v_organizationIDs", request.OrganizationIDs ?? string.Empty);
+            parameters.Add("@v_advancedFilters",JsonSerializer.Serialize(request.AdvancedFilters ?? new()));
 
             using var reader = await _dbConnection.QueryMultipleAsync(
                 "Proc_SalaryComposition_Filter",
@@ -155,6 +157,41 @@ namespace FresherMisa.Infrastructure.Repositories
             );
 
             return inserted;
+        }
+
+        /// <summary>
+        /// Cập nhật một phần thông tin thành phần lương
+        /// </summary>
+        /// <param name="id">ID thành phần lương</param>
+        /// <param name="request">Thông tin cần cập nhật</param>
+        /// <returns>Số bản ghi bị ảnh hưởng</returns>
+        /// CREATED BY: VVHung (03/06/2026)
+        public async Task<int> PatchAsync(Guid id, SalaryCompositionPatchRequest request)
+        {
+            var parameters = new DynamicParameters();
+
+            parameters.Add("@v_SalaryCompositionID", id.ToString());
+            parameters.Add("@v_SalaryCompositionName", request.SalaryCompositionName);
+            parameters.Add("@v_OrganizationIDs", request.OrganizationIDs);
+            parameters.Add("@v_SalaryCompositionType", request.SalaryCompositionType);
+            parameters.Add("@v_Nature", request.Nature);
+            parameters.Add("@v_TaxType", request.TaxType);
+            parameters.Add("@v_IsTaxReduction", request.IsTaxReduction);
+            parameters.Add("@v_NormFormula", request.NormFormula);
+            parameters.Add("@v_AllowOverNorm", request.AllowOverNorm);
+            parameters.Add("@v_ValueType", request.ValueType);
+            parameters.Add("@v_ValueFormula", request.ValueFormula);
+            parameters.Add("@v_Description", request.Description);
+            parameters.Add("@v_PayslipDisplayType", request.PayslipDisplayType);
+            parameters.Add("@v_Status", request.Status);
+
+            var result = await _dbConnection.ExecuteScalarAsync<int>(
+                "Proc_SalaryComposition_Patch",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return result;
         }
     }
 }

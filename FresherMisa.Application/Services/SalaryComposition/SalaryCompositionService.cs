@@ -176,6 +176,47 @@ namespace FresherMisa.Application.Services
             });
         }
 
+        /// <summary>
+        /// Cập nhật một phần thông tin thành phần lương
+        /// </summary>
+        /// <param name="id">ID thành phần lương</param>
+        /// <param name="request">Thông tin cần cập nhật</param>
+        /// <returns>Kết quả cập nhật</returns>
+        /// CREATED BY: VVHung (05/06/2026)
+        public async Task<ServiceResponse> PatchAsync(Guid id, SalaryCompositionPatchRequest request)
+        {
+            if (id == Guid.Empty)
+            {
+                return CreateErrorResponse(
+                    ResponseCode.BadRequest,
+                    "Id không hợp lệ"
+                );
+            }
+
+            if (request == null)
+            {
+                return CreateErrorResponse(
+                    ResponseCode.BadRequest,
+                    "Dữ liệu cập nhật không được để trống"
+                );
+            }
+
+            var rowAffects = await _salaryCompositionRepository.PatchAsync(id, request);
+
+            if (rowAffects <= 0)
+            {
+                return CreateErrorResponse(
+                    ResponseCode.NotFound,
+                    "Không tìm thấy thành phần lương"
+                );
+            }
+
+            return CreateSuccessResponse(new
+            {
+                Updated = rowAffects
+            });
+        }
+
         #region OVERRIDE METHODS
         protected override async Task<bool> ValidateBeforeDeleteAsync(Guid entityId)
         {

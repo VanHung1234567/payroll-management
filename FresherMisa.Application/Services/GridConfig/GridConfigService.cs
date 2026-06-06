@@ -60,8 +60,7 @@ namespace FresherMisa.Application.Services
                 );
             }
 
-            var rowAffects =
-                await _gridConfigRepository.SaveGridConfigAsync(request);
+            var rowAffects = await _gridConfigRepository.SaveGridConfigAsync(request);
 
             return CreateSuccessResponse(new
             {
