@@ -30,20 +30,23 @@ namespace FresherMisa.Application.Services
         /// pageSize: Số bản ghi mỗi trang
         /// pageIndex: Chỉ số trang
         /// search: Từ khóa tìm kiếm
-        /// salaryCompositionType: Loại thành phần
+        /// salaryCompositionType: Loại thành phần lương
+        /// advancedFilters: Danh sách điều kiện lọc nâng cao
         /// sort: Sắp xếp theo
         /// </param>
         /// <returns>Tổng số bản ghi và danh sách dữ liệu</returns>
         /// CREATED BY: VVHung (03/06/2026)
-        public async Task<ServiceResponse> FilterAsync(SalaryCompositionSystemFilterRequest request)
+        public async Task<ServiceResponse> FilterAsync(
+            SalaryCompositionSystemFilterRequest request)
         {
             var response = await _salaryCompositionSystemRepository.FilterAsync(request);
+
             return CreateSuccessResponse(response);
         }
 
 
         #region OVERRIDE METHODS
- 
+
         #endregion OVERRIDE METHODS
     }
 }

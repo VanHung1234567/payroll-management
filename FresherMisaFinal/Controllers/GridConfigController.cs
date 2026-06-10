@@ -40,7 +40,7 @@ namespace FresherMisa.WebAPI.Controllers
         /// </summary>
         /// <param name="request">Thông tin cấu hình cột</param>
         /// <returns>Kết quả lưu cấu hình</returns>
-        /// CREATED BY: VVHung (03/06/2026)
+        /// CREATED BY: VVHung (05/06/2026)
         [HttpPost("save-config")]
         public async Task<ActionResult<ServiceResponse>> SaveConfig(
             [FromBody] SaveGridConfigRequest request)

@@ -66,7 +66,7 @@ namespace FresherMisa.WebAPI.Controllers
         /// POST /api/SalaryComposition/bulk-delete
         /// Trả về ServiceResponse chứa kết quả xóa dữ liệu
         /// </summary>
-        /// CREATED BY: VVHung (03/06/2026
+        /// CREATED BY: VVHung (03/06/2026)
         [HttpPost("bulk-delete")]
         public async Task<ActionResult<ServiceResponse>> BulkDelete([FromBody] BulkDeleteSalaryCompositionRequest request)
         {
@@ -97,7 +97,7 @@ namespace FresherMisa.WebAPI.Controllers
         /// <param name="id">ID thành phần lương</param>
         /// <param name="request">Thông tin cần cập nhật</param>
         /// <returns>Kết quả cập nhật</returns>
-        /// CREATED BY: VVHung (03/06/2026)
+        /// CREATED BY: VVHung (05/06/2026)
         [HttpPatch("{id}")]
         public async Task<ActionResult<ServiceResponse>> Patch(
             Guid id,

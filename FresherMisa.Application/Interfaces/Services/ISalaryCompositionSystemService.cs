@@ -16,7 +16,8 @@ namespace FresherMisa.Application.Interfaces.Services
         /// pageSize: Số bản ghi mỗi trang
         /// pageIndex: Chỉ số trang
         /// search: Từ khóa tìm kiếm
-        /// salaryCompositionType: Loại thành phần
+        /// salaryCompositionType: Loại thành phần lương
+        /// advancedFilters: Danh sách điều kiện lọc nâng cao
         /// sort: Sắp xếp theo
         /// </param>
         /// <returns>Tổng số bản ghi và danh sách dữ liệu</returns>

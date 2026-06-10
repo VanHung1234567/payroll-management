@@ -8,5 +8,10 @@ namespace FresherMisa.Entities.SalaryCompositionSystem
         /// Loại thành phần lương.
         /// </summary>
         public SalaryCompositionType? SalaryCompositionType { get; set; }
+
+        /// <summary>
+        /// Danh sách điều kiện lọc nâng cao.
+        /// </summary>
+        public List<AdvancedFilterItem> AdvancedFilters { get; set; } = new();
     }
 }

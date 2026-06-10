@@ -88,7 +88,7 @@ namespace FresherMisa.Infrastructure.Repositories
         /// CREATED BY: VVHung (29/05/2026)
         private async Task<IEnumerable<TEntity>> GetEntitiesUsingCommandTextAsync()
         {
-            var query = new StringBuilder($"select {GetSelectColumns()} from {_tableName}");
+            var query = new StringBuilder($"select * from {_tableName}");
             int whereCount = 0;
 
             if (_modelType.GetHasDeletedColumn())
@@ -120,7 +120,7 @@ namespace FresherMisa.Infrastructure.Repositories
         /// <returns></returns>
         private async Task<TEntity> GetEntitieByIdUsingCommandTextAsync(string id)
         {
-            var query = new StringBuilder($"select {GetSelectColumns()} from {_tableName}");
+            var query = new StringBuilder($"select * from {_tableName}");
             int whereCount = 0;
 
             Func<StringBuilder, bool> AppendWhere = (query) =>
@@ -319,7 +319,7 @@ namespace FresherMisa.Infrastructure.Repositories
             try
             {
                 //1. Duyệt các thuộc tính trên entity và tạo parameters
-                var properties = entity.GetType().GetProperties().Where(IsDatabaseColumn);
+                var properties = entity.GetType().GetProperties();
 
                 foreach (var property in properties)
                 {
@@ -435,61 +435,6 @@ namespace FresherMisa.Infrastructure.Repositories
 
             return builder.ToString();
         }
-
-        /// <summary>
-        /// Sinh danh sách cột SELECT dựa trên các thuộc tính của thực thể
-        /// </summary>
-        /// <returns>
-        /// Chuỗi danh sách cột theo định dạng:
-        /// column_name AS PropertyName
-        /// </returns>
-        /// CREATED BY: VVHung (04/06/2026)
-        private string GetSelectColumns()
-        {
-            var columns = _modelType
-                .GetProperties()
-                .Where(IsDatabaseColumn)
-                .Select(property => $"{ToSnakeCase(property.Name)} AS {property.Name}");
-
-            return string.Join(", ", columns);
-        }
-
-        /// <summary>
-        /// Kiểm tra thuộc tính có được ánh xạ xuống cơ sở dữ liệu hay không
-        /// </summary>
-        /// <param name="property">Thông tin thuộc tính cần kiểm tra</param>
-        /// <returns>
-        /// True nếu thuộc tính được ánh xạ xuống database,
-        /// ngược lại trả về False
-        /// </returns>
-        /// CREATED BY: VVHung (04/06/2026)
-        private bool IsDatabaseColumn(PropertyInfo property)
-        {
-            if (property.Name == nameof(BaseModel.State))
-            {
-                return false;
-            }
-
-            if (property.IsDefined(typeof(NotMappedAttribute), false))
-            {
-                return false;
-            }
-
-            if (property.Name is nameof(BaseModel.CreatedBy)
-                or nameof(BaseModel.ModifiedBy)
-                or nameof(BaseModel.ModifiedDate))
-            {
-                return false;
-            }
-
-            if (property.Name == nameof(BaseModel.IsDeleted))
-            {
-                return _modelType.GetHasDeletedColumn();
-            }
-
-            return true;
-        }
-
         #endregion
     }
 }

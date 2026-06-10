@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FresherMisa.Entities.SalaryComposition
+namespace FresherMisa.Entities.Enums
 {
     public class AdvancedFilterItem
     {

@@ -47,10 +47,6 @@ namespace FresherMisa.Application.Services
             Data = userMessage
         };
 
-        private static PropertyInfo[] GetCachedProperties(Type entityType)
-        {
-            return _cachedProperties.GetOrAdd(entityType, type => type.GetProperties());
-        }
         #endregion
 
         #region Methods
@@ -152,8 +148,6 @@ namespace FresherMisa.Application.Services
             }
             return CreateErrorResponse(ResponseCode.NotFound, "Không tìm thấy bản ghi để cập nhật");
         }
-
-
 
         /// <summary>
         /// Lấy danh sách thực thể paging

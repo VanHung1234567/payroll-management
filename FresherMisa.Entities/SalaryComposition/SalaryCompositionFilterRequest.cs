@@ -1,4 +1,6 @@
-﻿namespace FresherMisa.Entities.SalaryComposition
+﻿using FresherMisa.Entities.Enums;
+
+namespace FresherMisa.Entities.SalaryComposition
 {
     public class SalaryCompositionFilterRequest : PagingRequest
     {
