@@ -30,6 +30,11 @@ namespace FresherMisa.WebAPI.Controllers
         {
             var response = await _salaryCompositionService.FilterAsync(request);
 
+            if (!response.IsSuccess)
+            {
+                return BadRequest(response);
+            }
+
             return Ok(response);
         }
 
@@ -43,6 +48,11 @@ namespace FresherMisa.WebAPI.Controllers
         public async Task<ActionResult<ServiceResponse>> GetDetailById(Guid id)
         {
             var response = await _salaryCompositionService.GetDetailByIdAsync(id);
+
+            if (!response.IsSuccess)
+            {
+                return BadRequest(response);
+            }
 
             return Ok(response);
         }
@@ -58,6 +68,11 @@ namespace FresherMisa.WebAPI.Controllers
         {
             var response = await _salaryCompositionService.BulkUpdateStatusAsync(request);
 
+            if (!response.IsSuccess)
+            {
+                return BadRequest(response);
+            }
+
             return Ok(response);
         }
 
@@ -72,6 +87,11 @@ namespace FresherMisa.WebAPI.Controllers
         {
             var response = await _salaryCompositionService.BulkDeleteAsync(request);
 
+            if (!response.IsSuccess)
+            {
+                return BadRequest(response);
+            }
+
             return Ok(response);
         }
 
@@ -85,6 +105,11 @@ namespace FresherMisa.WebAPI.Controllers
         public async Task<ActionResult<ServiceResponse>> CopyFromSystem([FromBody] CopySystemToSalaryRequest request)
         {
             var response = await _salaryCompositionService.CopyFromSystemAsync(request);
+
+            if (!response.IsSuccess)
+            {
+                return BadRequest(response);
+            }
 
             return Ok(response);
         }
@@ -104,6 +129,11 @@ namespace FresherMisa.WebAPI.Controllers
             [FromBody] SalaryCompositionPatchRequest request)
         {
             var response = await _salaryCompositionService.PatchAsync(id, request);
+
+            if (!response.IsSuccess)
+            {
+                return BadRequest(response);
+            }
 
             return Ok(response);
         }

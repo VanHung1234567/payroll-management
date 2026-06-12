@@ -14,7 +14,7 @@ namespace FresherMisa.Entities.Enums
         /// <summary>
         /// Toán tử lọc.
         /// </summary>
-        public string Operator { get; set; } = string.Empty;
+        public FilterOperator Operator { get; set; } = FilterOperator.Contains;
 
         /// <summary>
         /// Giá trị lọc.

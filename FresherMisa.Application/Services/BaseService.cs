@@ -1,5 +1,6 @@
 ﻿using FresherMisa.Application.Interfaces;
 using FresherMisa.Application.Interfaces.Services;
+using FresherMisa.Application.Helpers;
 using FresherMisa.Entities;
 using FresherMisa.Entities.Enums;
 using FresherMisa.Entities.Extensions;
@@ -157,18 +158,21 @@ namespace FresherMisa.Application.Services
         /// CREATED BY: VVHung (29/05/2026)
         public async Task<ServiceResponse> GetFilterPagingAsync(PagingRequest pagingRequest)
         {
-            var fields = string.IsNullOrEmpty(pagingRequest.SearchFields)
-                ? new List<string>()
-                : pagingRequest.SearchFields
-                    .Split(SearchFieldSeparator, StringSplitOptions.RemoveEmptyEntries)
-                    .ToList();
+            if (!QueryInputNormalizer.TryNormalizePaging<TEntity>(
+                    pagingRequest,
+                    out var fields,
+                    out var sort,
+                    out var error))
+            {
+                return CreateErrorResponse(ResponseCode.BadRequest, error ?? "Điều kiện lọc không hợp lệ");
+            }
 
              var response = await _baseRepository.GetFilterPagingAsync(
                     pagingRequest.PageSize,
                     pagingRequest.PageIndex,
                     pagingRequest.Search,
                     fields,
-                    pagingRequest.Sort
+                    sort
               );
 
                 return CreateSuccessResponse(response);

@@ -30,6 +30,11 @@ namespace FresherMisa.WebAPI.Controllers
         {
             var response = await _gridConfigService.GetByGridKeyAsync(gridKey);
 
+            if (!response.IsSuccess)
+            {
+                return BadRequest(response);
+            }
+
             return Ok(response);
         }
 
@@ -45,8 +50,12 @@ namespace FresherMisa.WebAPI.Controllers
         public async Task<ActionResult<ServiceResponse>> SaveConfig(
             [FromBody] SaveGridConfigRequest request)
         {
-            var response =
-                await _gridConfigService.SaveGridConfigAsync(request);
+            var response = await _gridConfigService.SaveGridConfigAsync(request);
+
+            if (!response.IsSuccess)
+            {
+                return BadRequest(response);
+            }
 
             return Ok(response);
         }

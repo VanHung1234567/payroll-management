@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using FresherMisa.Application.Interfaces.Repositories;
 using FresherMisa.Entities;
+using FresherMisa.Entities.Enums;
 using FresherMisa.Entities.SalaryComposition;
 using Microsoft.Extensions.Configuration;
 using System.Text.Json;
@@ -45,7 +46,7 @@ namespace FresherMisa.Infrastructure.Repositories
             parameters.Add("@v_sort", request.Sort ?? string.Empty);
             parameters.Add("@v_status", request.Status);
             parameters.Add("@v_organizationIDs", request.OrganizationIDs ?? string.Empty);
-            parameters.Add("@v_advancedFilters",JsonSerializer.Serialize(request.AdvancedFilters ?? new()));
+            parameters.Add("@v_advancedFilters", SerializeAdvancedFilters(request.AdvancedFilters));
 
             using var reader = await _dbConnection.QueryMultipleAsync(
                 "Proc_SalaryComposition_Filter",
@@ -192,6 +193,32 @@ namespace FresherMisa.Infrastructure.Repositories
             );
 
             return result;
+        }
+
+        private static string SerializeAdvancedFilters(IEnumerable<AdvancedFilterItem>? filters)
+        {
+            return JsonSerializer.Serialize((filters ?? new List<AdvancedFilterItem>()).Select(filter => new
+            {
+                filter.FieldName,
+                Operator = ToProcedureOperator(filter.Operator),
+                filter.Value
+            }));
+        }
+
+        private static string ToProcedureOperator(FilterOperator filterOperator)
+        {
+            return filterOperator switch
+            {
+                FilterOperator.Contains => "contains",
+                FilterOperator.NotContains => "notContains",
+                FilterOperator.Equals => "equals",
+                FilterOperator.NotEquals => "notEquals",
+                FilterOperator.StartsWith => "startsWith",
+                FilterOperator.EndsWith => "endsWith",
+                FilterOperator.Empty => "empty",
+                FilterOperator.NotEmpty => "notEmpty",
+                _ => string.Empty
+            };
         }
     }
 }

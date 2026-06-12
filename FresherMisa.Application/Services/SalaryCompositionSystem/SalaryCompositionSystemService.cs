@@ -1,8 +1,10 @@
 ﻿using FresherMisa.Application.Interfaces;
 using FresherMisa.Application.Interfaces.Repositories;
 using FresherMisa.Application.Interfaces.Services;
+using FresherMisa.Application.Helpers;
 using FresherMisa.Application.Services;
 using FresherMisa.Entities;
+using FresherMisa.Entities.Enums;
 using FresherMisa.Entities.GridConfig;
 using FresherMisa.Entities.SalaryCompositionSystem;
 using System;
@@ -14,6 +16,28 @@ namespace FresherMisa.Application.Services
     public class SalaryCompositionSystemService : BaseService<SalaryCompositionSystem>, ISalaryCompositionSystemService
     {
         private readonly ISalaryCompositionSystemRepository _salaryCompositionSystemRepository;
+        private static readonly HashSet<string> AllowedSortFields = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "SalaryCompositionCode",
+            "SalaryCompositionName",
+            "SalaryCompositionType",
+            "CreatedDate"
+        };
+
+        private static readonly HashSet<string> AllowedAdvancedFilterFields = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "SalaryCompositionCode",
+            "SalaryCompositionName",
+            "SalaryCompositionType",
+            "Nature",
+            "TaxType",
+            "IsTaxReduction",
+            "NormFormula",
+            "ValueType",
+            "ValueFormula",
+            "Description",
+            "PayslipDisplayType"
+        };
 
         public SalaryCompositionSystemService(
             IBaseRepository<SalaryCompositionSystem> baseRepository,
@@ -39,6 +63,19 @@ namespace FresherMisa.Application.Services
         public async Task<ServiceResponse> FilterAsync(
             SalaryCompositionSystemFilterRequest request)
         {
+            if (!QueryInputNormalizer.TryNormalizeSort(request.Sort, AllowedSortFields, out var sort, out var error))
+            {
+                return CreateErrorResponse(ResponseCode.BadRequest, error ?? "Sắp xếp không hợp lệ");
+            }
+
+            if (!QueryInputNormalizer.TryValidateAdvancedFilterFields(request.AdvancedFilters, AllowedAdvancedFilterFields, out error))
+            {
+                return CreateErrorResponse(ResponseCode.BadRequest, error ?? "Điều kiện lọc không hợp lệ");
+            }
+
+            request.Search = QueryInputNormalizer.NormalizeSearch(request.Search);
+            request.Sort = sort;
+
             var response = await _salaryCompositionSystemRepository.FilterAsync(request);
 
             return CreateSuccessResponse(response);

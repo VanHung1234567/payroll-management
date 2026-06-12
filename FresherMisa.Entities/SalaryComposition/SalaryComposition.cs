@@ -101,5 +101,10 @@ namespace FresherMisa.Entities.SalaryComposition
         /// </summary>
         public Status? Status { get; set; }
 
+        /// <summary>
+        /// ID thành phần lương hệ thống nguồn.
+        /// </summary>
+        public Guid? SalaryCompositionSystemID { get; set; }
+
     }
 }

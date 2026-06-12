@@ -1,10 +1,12 @@
 ﻿using FresherMisa.Application.Interfaces;
 using FresherMisa.Application.Interfaces.Repositories;
 using FresherMisa.Application.Interfaces.Services;
+using FresherMisa.Application.Helpers;
 using FresherMisa.Application.Services;
 using FresherMisa.Entities;
 using FresherMisa.Entities.Enums;
 using FresherMisa.Entities.SalaryComposition;
+using MySqlConnector;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,6 +16,32 @@ namespace FresherMisa.Application.Services
     public class SalaryCompositionService : BaseService<SalaryComposition>, ISalaryCompositionService
     {
         private readonly ISalaryCompositionRepository _salaryCompositionRepository;
+        private static readonly HashSet<string> AllowedSortFields = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "SalaryCompositionCode",
+            "SalaryCompositionName",
+            "OrganizationNames",
+            "SalaryCompositionType",
+            "CreatedDate"
+        };
+
+        private static readonly HashSet<string> AllowedAdvancedFilterFields = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "SalaryCompositionCode",
+            "SalaryCompositionName",
+            "OrganizationNames",
+            "SalaryCompositionType",
+            "Nature",
+            "TaxType",
+            "IsTaxReduction",
+            "NormFormula",
+            "ValueType",
+            "ValueFormula",
+            "Description",
+            "PayslipDisplayType",
+            "CreatedSource",
+            "Status"
+        };
 
         public SalaryCompositionService(
             IBaseRepository<SalaryComposition> baseRepository,
@@ -38,6 +66,25 @@ namespace FresherMisa.Application.Services
         /// CREATED BY: VVHung (03/06/2026)
         public async Task<ServiceResponse> FilterAsync(SalaryCompositionFilterRequest request)
         {
+            if (!QueryInputNormalizer.TryNormalizeSort(request.Sort, AllowedSortFields, out var sort, out var error))
+            {
+                return CreateErrorResponse(ResponseCode.BadRequest, error ?? "Sắp xếp không hợp lệ");
+            }
+
+            if (!QueryInputNormalizer.TryValidateAdvancedFilterFields(request.AdvancedFilters, AllowedAdvancedFilterFields, out error))
+            {
+                return CreateErrorResponse(ResponseCode.BadRequest, error ?? "Điều kiện lọc không hợp lệ");
+            }
+
+            if (!QueryInputNormalizer.TryNormalizeGuidList(request.OrganizationIDs, out var organizationIDs, out error))
+            {
+                return CreateErrorResponse(ResponseCode.BadRequest, error ?? "Danh sách đơn vị không hợp lệ");
+            }
+
+            request.Search = QueryInputNormalizer.NormalizeSearch(request.Search);
+            request.Sort = sort;
+            request.OrganizationIDs = organizationIDs;
+
             var response = await _salaryCompositionRepository.FilterAsync(request);
 
             return CreateSuccessResponse(response);
@@ -166,14 +213,24 @@ namespace FresherMisa.Application.Services
 
             var systemIds = string.Join(";", request.SalaryCompositionSystemIDs);
 
-            var rowAffects = await _salaryCompositionRepository
-                .CopyFromSystemAsync(systemIds);
-
-            return CreateSuccessResponse(new
+            try
             {
-                Inserted = rowAffects,
-                TotalSelected = request.SalaryCompositionSystemIDs.Count,
-            });
+                var rowAffects = await _salaryCompositionRepository
+                    .CopyFromSystemAsync(systemIds);
+
+                return CreateSuccessResponse(new
+                {
+                    Inserted = rowAffects,
+                    TotalSelected = request.SalaryCompositionSystemIDs.Count,
+                });
+            }
+            catch (MySqlException ex) when (ex.SqlState == "45000")
+            {
+                return CreateErrorResponse(
+                    ResponseCode.BadRequest,
+                    ex.Message
+                );
+            }
         }
 
         /// <summary>
@@ -200,6 +257,13 @@ namespace FresherMisa.Application.Services
                     "Dữ liệu cập nhật không được để trống"
                 );
             }
+
+            if (!QueryInputNormalizer.TryNormalizeGuidList(request.OrganizationIDs, out var organizationIDs, out var error))
+            {
+                return CreateErrorResponse(ResponseCode.BadRequest, error ?? "Danh sách đơn vị không hợp lệ");
+            }
+
+            request.OrganizationIDs = organizationIDs;
 
             var rowAffects = await _salaryCompositionRepository.PatchAsync(id, request);
 
