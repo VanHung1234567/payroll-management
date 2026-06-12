@@ -19,19 +19,13 @@ namespace FresherMisa.Application.Helpers
 
         /// <summary>
         /// Chuẩn hóa dữ liệu paging trước khi truyền xuống repository.
+        /// Chỉ cho phép SearchFields và Sort sử dụng các property có thật trên entity.
         /// </summary>
         /// <typeparam name="TEntity">Kiểu thực thể cần kiểm tra.</typeparam>
         /// <param name="request">Thông tin paging từ client.</param>
-        /// <param name="searchFields">Danh sách trường tìm kiếm hợp lệ.</param>
-        /// <param name="sort">Chuỗi sắp xếp hợp lệ.</param>
-        /// <param name="error">Thông báo lỗi nếu có.</param>
-        /// <returns>True nếu dữ liệu hợp lệ, ngược lại False.</returns>
+        /// <returns>Kết quả chuẩn hóa gồm SearchFields, Sort và lỗi nếu có.</returns>
         /// CREATED BY: VVHung (11/06/2026)
-        public static bool TryNormalizePaging<TEntity>(
-            PagingRequest request,
-            out List<string> searchFields,
-            out string sort,
-            out string? error)
+        public static QueryNormalizeResult NormalizePaging<TEntity>(PagingRequest request)
         {
             var allowedFields = typeof(TEntity)
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance)
@@ -40,166 +34,130 @@ namespace FresherMisa.Application.Helpers
                 .Select(property => property.Name)
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-            searchFields = new List<string>();
-            sort = string.Empty;
-            error = null;
-
             request.Search = NormalizeSearch(request.Search);
 
-            if (!TryNormalizeSearchFields(
-                request.SearchFields,
-                allowedFields,
-                out searchFields,
-                out error))
+            var searchFieldsResult = NormalizeSearchFields(request.SearchFields, allowedFields);
+            if (!searchFieldsResult.IsValid)
             {
-                return false;
+                return searchFieldsResult;
             }
 
-            if (!TryNormalizeSort(
-                request.Sort,
-                allowedFields,
-                out sort,
-                out error))
+            var sortResult = NormalizeSort(request.Sort, allowedFields);
+            if (!sortResult.IsValid)
             {
-                return false;
+                return sortResult;
             }
 
-            return true;
+            return new QueryNormalizeResult
+            {
+                SearchFields = searchFieldsResult.SearchFields,
+                Sort = sortResult.Sort
+            };
         }
 
         /// <summary>
         /// Chuẩn hóa chuỗi sắp xếp theo whitelist field.
+        /// Chỉ giữ các field nằm trong allowedFields, hỗ trợ dấu '-' để sắp xếp giảm dần.
         /// </summary>
         /// <param name="sort">Chuỗi sort từ client.</param>
-        /// <param name="allowedFields">Danh sách field được phép.</param>
-        /// <param name="normalizedSort">Chuỗi sort sau khi chuẩn hóa.</param>
-        /// <param name="error">Thông báo lỗi nếu có.</param>
-        /// <returns>True nếu hợp lệ, ngược lại False.</returns>
+        /// <param name="allowedFields">Danh sách field được phép sort.</param>
+        /// <returns>Kết quả chứa chuỗi sort hợp lệ hoặc lỗi nếu field không hợp lệ.</returns>
         /// CREATED BY: VVHung (11/06/2026)
-        public static bool TryNormalizeSort(
+        public static QueryNormalizeResult NormalizeSort(
             string? sort,
-            ISet<string> allowedFields,
-            out string normalizedSort,
-            out string? error)
+            ISet<string> allowedFields)
         {
-            normalizedSort = string.Empty;
-            error = null;
-
             if (string.IsNullOrWhiteSpace(sort))
             {
-                return true;
+                return new QueryNormalizeResult();
             }
 
             var result = new List<string>();
 
-            foreach (var item in sort.Split(
-                ',',
-                StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            foreach (var item in sort.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
             {
                 var isDescending = item.StartsWith("-");
                 var fieldName = isDescending ? item[1..] : item;
 
-                if (!TryGetAllowedField(
-                    fieldName,
-                    allowedFields,
-                    out var safeFieldName))
+                if (!TryGetAllowedField(fieldName, allowedFields, out var safeFieldName))
                 {
-                    error = $"Trường sắp xếp không hợp lệ: {fieldName}";
-                    return false;
+                    return Invalid($"Trường sắp xếp không hợp lệ: {fieldName}");
                 }
 
-                result.Add(
-                    isDescending
-                        ? $"-{safeFieldName}"
-                        : safeFieldName);
+                result.Add(isDescending ? $"-{safeFieldName}" : safeFieldName);
             }
 
-            normalizedSort = string.Join(",", result);
-
-            return true;
+            return new QueryNormalizeResult
+            {
+                Sort = string.Join(",", result)
+            };
         }
 
         /// <summary>
-        /// Kiểm tra danh sách field lọc nâng cao.
+        /// Kiểm tra danh sách field lọc nâng cao theo whitelist.
+        /// Hàm này chỉ kiểm tra FieldName vì FieldName có thể được ghép vào dynamic SQL trong procedure.
         /// </summary>
         /// <param name="filters">Danh sách bộ lọc nâng cao.</param>
-        /// <param name="allowedFields">Danh sách field được phép.</param>
-        /// <param name="error">Thông báo lỗi nếu có.</param>
-        /// <returns>True nếu hợp lệ, ngược lại False.</returns>
+        /// <param name="allowedFields">Danh sách field được phép lọc.</param>
+        /// <returns>Kết quả hợp lệ hoặc lỗi nếu có field không nằm trong whitelist.</returns>
         /// CREATED BY: VVHung (11/06/2026)
-        public static bool TryValidateAdvancedFilterFields(
+        public static QueryNormalizeResult ValidateAdvancedFilterFields(
             IEnumerable<AdvancedFilterItem>? filters,
-            ISet<string> allowedFields,
-            out string? error)
+            ISet<string> allowedFields)
         {
-            error = null;
-
             if (filters == null)
             {
-                return true;
+                return new QueryNormalizeResult();
             }
 
             foreach (var filter in filters)
             {
-                if (!TryGetAllowedField(
-                    filter.FieldName,
-                    allowedFields,
-                    out var safeFieldName))
+                if (!TryGetAllowedField(filter.FieldName, allowedFields, out var safeFieldName))
                 {
-                    error = $"Trường lọc không hợp lệ: {filter.FieldName}";
-                    return false;
+                    return Invalid($"Trường lọc không hợp lệ: {filter.FieldName}");
                 }
 
                 filter.FieldName = safeFieldName;
             }
 
-            return true;
+            return new QueryNormalizeResult();
         }
 
         /// <summary>
         /// Chuẩn hóa danh sách Guid phân tách bằng dấu ';'.
+        /// Dùng cho các input dạng chuỗi id như OrganizationIDs trước khi gửi xuống procedure.
         /// </summary>
-        /// <param name="value">Chuỗi Guid.</param>
-        /// <param name="normalizedValue">Chuỗi Guid hợp lệ.</param>
-        /// <param name="error">Thông báo lỗi nếu có.</param>
-        /// <returns>True nếu hợp lệ, ngược lại False.</returns>
+        /// <param name="value">Chuỗi Guid phân tách bằng dấu ';'.</param>
+        /// <returns>Kết quả chứa chuỗi Guid hợp lệ hoặc lỗi nếu có id không hợp lệ.</returns>
         /// CREATED BY: VVHung (11/06/2026)
-        public static bool TryNormalizeGuidList(
-            string? value,
-            out string normalizedValue,
-            out string? error)
+        public static QueryNormalizeResult NormalizeGuidList(string? value)
         {
-            normalizedValue = string.Empty;
-            error = null;
-
             if (string.IsNullOrWhiteSpace(value))
             {
-                return true;
+                return new QueryNormalizeResult();
             }
 
             var result = new List<string>();
 
-            foreach (var item in value.Split(
-                ';',
-                StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            foreach (var item in value.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
             {
-                if (!Guid.TryParse(item, out var id)
-                    || id == Guid.Empty)
+                if (!Guid.TryParse(item, out var id) || id == Guid.Empty)
                 {
-                    error = $"Id không hợp lệ: {item}";
-                    return false;
+                    return Invalid($"Id không hợp lệ: {item}");
                 }
 
                 result.Add(id.ToString());
             }
 
-            normalizedValue = string.Join(";", result);
-
-            return true;
+            return new QueryNormalizeResult
+            {
+                Value = string.Join(";", result)
+            };
         }
 
         /// <summary>
         /// Chuẩn hóa từ khóa tìm kiếm.
+        /// Search là value nên không cần whitelist field, chỉ trim và giới hạn độ dài.
         /// </summary>
         /// <param name="search">Từ khóa tìm kiếm.</param>
         /// <returns>Từ khóa sau khi chuẩn hóa.</returns>
@@ -219,54 +177,48 @@ namespace FresherMisa.Application.Helpers
         }
 
         /// <summary>
-        /// Chuẩn hóa danh sách field tìm kiếm.
+        /// Chuẩn hóa danh sách field tìm kiếm theo whitelist.
+        /// SearchFields có thể được procedure ghép thành tên cột trong dynamic SQL nên cần kiểm tra chặt.
         /// </summary>
-        /// <param name="searchFieldsValue">Chuỗi field tìm kiếm.</param>
-        /// <param name="allowedFields">Danh sách field được phép.</param>
-        /// <param name="searchFields">Danh sách field hợp lệ.</param>
-        /// <param name="error">Thông báo lỗi nếu có.</param>
-        /// <returns>True nếu hợp lệ, ngược lại False.</returns>
+        /// <param name="searchFieldsValue">Chuỗi field tìm kiếm, phân tách bằng dấu ';'.</param>
+        /// <param name="allowedFields">Danh sách field được phép tìm kiếm.</param>
+        /// <returns>Kết quả chứa danh sách field hợp lệ hoặc lỗi nếu có field không hợp lệ.</returns>
         /// CREATED BY: VVHung (11/06/2026)
-        private static bool TryNormalizeSearchFields(
+        private static QueryNormalizeResult NormalizeSearchFields(
             string? searchFieldsValue,
-            ISet<string> allowedFields,
-            out List<string> searchFields,
-            out string? error)
+            ISet<string> allowedFields)
         {
-            searchFields = new List<string>();
-            error = null;
-
             if (string.IsNullOrWhiteSpace(searchFieldsValue))
             {
-                return true;
+                return new QueryNormalizeResult();
             }
 
-            foreach (var field in searchFieldsValue.Split(
-                ';',
-                StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            var result = new List<string>();
+
+            foreach (var field in searchFieldsValue.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
             {
-                if (!TryGetAllowedField(
-                    field,
-                    allowedFields,
-                    out var safeFieldName))
+                if (!TryGetAllowedField(field, allowedFields, out var safeFieldName))
                 {
-                    error = $"Trường tìm kiếm không hợp lệ: {field}";
-                    return false;
+                    return Invalid($"Trường tìm kiếm không hợp lệ: {field}");
                 }
 
-                searchFields.Add(safeFieldName);
+                result.Add(safeFieldName);
             }
 
-            return true;
+            return new QueryNormalizeResult
+            {
+                SearchFields = result
+            };
         }
 
         /// <summary>
         /// Kiểm tra field có nằm trong whitelist hay không.
+        /// Trả về đúng tên field trong whitelist để chuẩn hóa hoa thường trước khi truyền xuống procedure.
         /// </summary>
         /// <param name="fieldName">Tên field cần kiểm tra.</param>
         /// <param name="allowedFields">Danh sách field được phép.</param>
-        /// <param name="safeFieldName">Tên field hợp lệ.</param>
-        /// <returns>True nếu hợp lệ, ngược lại False.</returns>
+        /// <param name="safeFieldName">Tên field hợp lệ đã chuẩn hóa theo whitelist.</param>
+        /// <returns>True nếu field hợp lệ, ngược lại False.</returns>
         /// CREATED BY: VVHung (11/06/2026)
         private static bool TryGetAllowedField(
             string? fieldName,
@@ -281,10 +233,7 @@ namespace FresherMisa.Application.Helpers
             }
 
             var matchedField = allowedFields.FirstOrDefault(field =>
-                string.Equals(
-                    field,
-                    fieldName.Trim(),
-                    StringComparison.OrdinalIgnoreCase));
+                string.Equals(field, fieldName.Trim(), StringComparison.OrdinalIgnoreCase));
 
             if (matchedField == null)
             {
@@ -292,8 +241,22 @@ namespace FresherMisa.Application.Helpers
             }
 
             safeFieldName = matchedField;
-
             return true;
+        }
+
+        /// <summary>
+        /// Tạo kết quả lỗi validate.
+        /// </summary>
+        /// <param name="error">Thông báo lỗi.</param>
+        /// <returns>Kết quả không hợp lệ.</returns>
+        /// CREATED BY: VVHung (11/06/2026)
+        private static QueryNormalizeResult Invalid(string error)
+        {
+            return new QueryNormalizeResult
+            {
+                IsValid = false,
+                Error = error
+            };
         }
     }
 }

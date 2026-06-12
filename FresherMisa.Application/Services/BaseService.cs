@@ -158,21 +158,19 @@ namespace FresherMisa.Application.Services
         /// CREATED BY: VVHung (29/05/2026)
         public async Task<ServiceResponse> GetFilterPagingAsync(PagingRequest pagingRequest)
         {
-            if (!QueryInputNormalizer.TryNormalizePaging<TEntity>(
-                    pagingRequest,
-                    out var fields,
-                    out var sort,
-                    out var error))
+            var normalizeResult = QueryInputNormalizer.NormalizePaging<TEntity>(pagingRequest);
+
+            if (!normalizeResult.IsValid)
             {
-                return CreateErrorResponse(ResponseCode.BadRequest, error ?? "Điều kiện lọc không hợp lệ");
+                return CreateErrorResponse(ResponseCode.BadRequest, normalizeResult.Error);
             }
 
              var response = await _baseRepository.GetFilterPagingAsync(
                     pagingRequest.PageSize,
                     pagingRequest.PageIndex,
                     pagingRequest.Search,
-                    fields,
-                    sort
+                    normalizeResult.SearchFields,
+                    normalizeResult.Sort
               );
 
                 return CreateSuccessResponse(response);

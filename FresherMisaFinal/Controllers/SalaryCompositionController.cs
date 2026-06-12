@@ -30,10 +30,8 @@ namespace FresherMisa.WebAPI.Controllers
         {
             var response = await _salaryCompositionService.FilterAsync(request);
 
-            if (!response.IsSuccess)
-            {
+            if (!response.IsSuccess && response.Code == (int)ResponseCode.BadRequest)
                 return BadRequest(response);
-            }
 
             return Ok(response);
         }
@@ -49,10 +47,8 @@ namespace FresherMisa.WebAPI.Controllers
         {
             var response = await _salaryCompositionService.GetDetailByIdAsync(id);
 
-            if (!response.IsSuccess)
-            {
+            if (!response.IsSuccess && response.Code == (int)ResponseCode.BadRequest)
                 return BadRequest(response);
-            }
 
             return Ok(response);
         }
@@ -68,10 +64,8 @@ namespace FresherMisa.WebAPI.Controllers
         {
             var response = await _salaryCompositionService.BulkUpdateStatusAsync(request);
 
-            if (!response.IsSuccess)
-            {
+            if (!response.IsSuccess && response.Code == (int)ResponseCode.BadRequest)
                 return BadRequest(response);
-            }
 
             return Ok(response);
         }
@@ -87,10 +81,8 @@ namespace FresherMisa.WebAPI.Controllers
         {
             var response = await _salaryCompositionService.BulkDeleteAsync(request);
 
-            if (!response.IsSuccess)
-            {
+            if (!response.IsSuccess && response.Code == (int)ResponseCode.BadRequest)
                 return BadRequest(response);
-            }
 
             return Ok(response);
         }
@@ -106,10 +98,8 @@ namespace FresherMisa.WebAPI.Controllers
         {
             var response = await _salaryCompositionService.CopyFromSystemAsync(request);
 
-            if (!response.IsSuccess)
-            {
+            if (!response.IsSuccess && response.Code == (int)ResponseCode.BadRequest)
                 return BadRequest(response);
-            }
 
             return Ok(response);
         }
@@ -130,10 +120,8 @@ namespace FresherMisa.WebAPI.Controllers
         {
             var response = await _salaryCompositionService.PatchAsync(id, request);
 
-            if (!response.IsSuccess)
-            {
+            if (!response.IsSuccess && response.Code == (int)ResponseCode.BadRequest)
                 return BadRequest(response);
-            }
 
             return Ok(response);
         }

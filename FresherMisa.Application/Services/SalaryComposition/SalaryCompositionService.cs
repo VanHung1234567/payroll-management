@@ -66,24 +66,29 @@ namespace FresherMisa.Application.Services
         /// CREATED BY: VVHung (03/06/2026)
         public async Task<ServiceResponse> FilterAsync(SalaryCompositionFilterRequest request)
         {
-            if (!QueryInputNormalizer.TryNormalizeSort(request.Sort, AllowedSortFields, out var sort, out var error))
+            var sortResult = QueryInputNormalizer.NormalizeSort(request.Sort, AllowedSortFields);
+            if (!sortResult.IsValid)
             {
-                return CreateErrorResponse(ResponseCode.BadRequest, error ?? "Sắp xếp không hợp lệ");
+                return CreateErrorResponse(ResponseCode.BadRequest, sortResult.Error);
             }
 
-            if (!QueryInputNormalizer.TryValidateAdvancedFilterFields(request.AdvancedFilters, AllowedAdvancedFilterFields, out error))
+            var filterResult = QueryInputNormalizer.ValidateAdvancedFilterFields(
+                request.AdvancedFilters,
+                AllowedAdvancedFilterFields);
+            if (!filterResult.IsValid)
             {
-                return CreateErrorResponse(ResponseCode.BadRequest, error ?? "Điều kiện lọc không hợp lệ");
+                return CreateErrorResponse(ResponseCode.BadRequest, filterResult.Error);
             }
 
-            if (!QueryInputNormalizer.TryNormalizeGuidList(request.OrganizationIDs, out var organizationIDs, out error))
+            var organizationResult = QueryInputNormalizer.NormalizeGuidList(request.OrganizationIDs);
+            if (!organizationResult.IsValid)
             {
-                return CreateErrorResponse(ResponseCode.BadRequest, error ?? "Danh sách đơn vị không hợp lệ");
+                return CreateErrorResponse(ResponseCode.BadRequest, organizationResult.Error);
             }
 
             request.Search = QueryInputNormalizer.NormalizeSearch(request.Search);
-            request.Sort = sort;
-            request.OrganizationIDs = organizationIDs;
+            request.Sort = sortResult.Sort;
+            request.OrganizationIDs = organizationResult.Value;
 
             var response = await _salaryCompositionRepository.FilterAsync(request);
 
@@ -258,12 +263,13 @@ namespace FresherMisa.Application.Services
                 );
             }
 
-            if (!QueryInputNormalizer.TryNormalizeGuidList(request.OrganizationIDs, out var organizationIDs, out var error))
+            var organizationResult = QueryInputNormalizer.NormalizeGuidList(request.OrganizationIDs);
+            if (!organizationResult.IsValid)
             {
-                return CreateErrorResponse(ResponseCode.BadRequest, error ?? "Danh sách đơn vị không hợp lệ");
+                return CreateErrorResponse(ResponseCode.BadRequest, organizationResult.Error);
             }
 
-            request.OrganizationIDs = organizationIDs;
+            request.OrganizationIDs = organizationResult.Value;
 
             var rowAffects = await _salaryCompositionRepository.PatchAsync(id, request);
 

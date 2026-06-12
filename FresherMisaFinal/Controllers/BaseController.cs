@@ -26,6 +26,9 @@ namespace FresherMisa.WebAPI.Controllers
         {
             var response = await _baseService.GetFilterPagingAsync(pagingRequest);
 
+            if (!response.IsSuccess && response.Code == (int)ResponseCode.BadRequest)
+                return BadRequest(response);
+
             return Ok(response);
         }
 
@@ -38,6 +41,7 @@ namespace FresherMisa.WebAPI.Controllers
         public async Task<ActionResult<ServiceResponse>> Get()
         {
             var response = await _baseService.GetEntitiesAsync();
+
             return Ok(response);
         }
 

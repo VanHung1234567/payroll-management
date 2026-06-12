@@ -63,18 +63,22 @@ namespace FresherMisa.Application.Services
         public async Task<ServiceResponse> FilterAsync(
             SalaryCompositionSystemFilterRequest request)
         {
-            if (!QueryInputNormalizer.TryNormalizeSort(request.Sort, AllowedSortFields, out var sort, out var error))
+            var sortResult = QueryInputNormalizer.NormalizeSort(request.Sort, AllowedSortFields);
+            if (!sortResult.IsValid)
             {
-                return CreateErrorResponse(ResponseCode.BadRequest, error ?? "Sắp xếp không hợp lệ");
+                return CreateErrorResponse(ResponseCode.BadRequest, sortResult.Error);
             }
 
-            if (!QueryInputNormalizer.TryValidateAdvancedFilterFields(request.AdvancedFilters, AllowedAdvancedFilterFields, out error))
+            var filterResult = QueryInputNormalizer.ValidateAdvancedFilterFields(
+                request.AdvancedFilters,
+                AllowedAdvancedFilterFields);
+            if (!filterResult.IsValid)
             {
-                return CreateErrorResponse(ResponseCode.BadRequest, error ?? "Điều kiện lọc không hợp lệ");
+                return CreateErrorResponse(ResponseCode.BadRequest, filterResult.Error);
             }
 
             request.Search = QueryInputNormalizer.NormalizeSearch(request.Search);
-            request.Sort = sort;
+            request.Sort = sortResult.Sort;
 
             var response = await _salaryCompositionSystemRepository.FilterAsync(request);
 

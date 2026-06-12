@@ -40,10 +40,8 @@ namespace FresherMisa.WebAPI.Controllers
         {
             var response = await _salaryCompositionSystemService.FilterAsync(request);
 
-            if (!response.IsSuccess)
-            {
+            if (!response.IsSuccess && response.Code == (int)ResponseCode.BadRequest)
                 return BadRequest(response);
-            }
 
             return Ok(response);
         }
