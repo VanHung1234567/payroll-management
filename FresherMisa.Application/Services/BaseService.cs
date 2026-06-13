@@ -20,8 +20,6 @@ namespace FresherMisa.Application.Services
         #region Declare
         protected readonly IBaseRepository<TEntity> _baseRepository;
         private readonly string _tableName;
-        private static readonly ConcurrentDictionary<Type, PropertyInfo[]> _cachedProperties = new();
-        private const string SearchFieldSeparator = ";";
         #endregion
 
         #region Constructer
@@ -165,10 +163,10 @@ namespace FresherMisa.Application.Services
                 return CreateErrorResponse(ResponseCode.BadRequest, normalizeResult.Error);
             }
 
-             var response = await _baseRepository.GetFilterPagingAsync(
+            var response = await _baseRepository.GetFilterPagingAsync(
                     pagingRequest.PageSize,
                     pagingRequest.PageIndex,
-                    pagingRequest.Search,
+                    pagingRequest.Search ?? string.Empty,
                     normalizeResult.SearchFields,
                     normalizeResult.Sort
               );

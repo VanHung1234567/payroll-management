@@ -40,20 +40,6 @@ namespace FresherMisa.Entities.Extensions
         }
 
         /// <summary>
-        /// Lấy tên hiển thị của một property dựa vào DisplayAttribute.
-        /// Nếu không có DisplayAttribute trả về chính tên property.
-        /// </summary>
-        /// <param name="name">Tên property</param>
-        public static string GetColumnDisplayName(this Type type, string name)
-        {
-            var obj = type.GetProperty(name).GetCustomAttributes(typeof(DisplayAttribute),
-                                               false).Cast<DisplayAttribute>().SingleOrDefault();
-            if (obj == null) return name;
-
-            return obj.Name;
-        }
-
-        /// <summary>
         /// Kiểm tra cấu hình table có cột IsDeleted (xóa mềm) hay không.
         /// Nếu true thì repository sẽ thêm điều kiện lọc IsDeleted = FALSE trong truy vấn đọc.
         /// </summary>

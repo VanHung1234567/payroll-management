@@ -28,9 +28,7 @@ namespace FresherMisa.Application.Helpers
         public static QueryNormalizeResult NormalizePaging<TEntity>(PagingRequest request)
         {
             var allowedFields = typeof(TEntity)
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Where(property => property.Name != nameof(BaseModel.State)
-                    && property.Name != nameof(BaseModel.IsDeleted))
+                .GetProperties()
                 .Select(property => property.Name)
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
 

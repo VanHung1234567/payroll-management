@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace FresherMisa.Entities.Enums
 {
@@ -14,6 +15,7 @@ namespace FresherMisa.Entities.Enums
         /// <summary>
         /// Toán tử lọc.
         /// </summary>
+        [JsonConverter(typeof(JsonStringEnumConverter<FilterOperator>))]
         public FilterOperator Operator { get; set; } = FilterOperator.Contains;
 
         /// <summary>

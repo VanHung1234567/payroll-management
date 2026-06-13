@@ -16,15 +16,7 @@ namespace FresherMisa.Application.Services
     public class SalaryCompositionSystemService : BaseService<SalaryCompositionSystem>, ISalaryCompositionSystemService
     {
         private readonly ISalaryCompositionSystemRepository _salaryCompositionSystemRepository;
-        private static readonly HashSet<string> AllowedSortFields = new(StringComparer.OrdinalIgnoreCase)
-        {
-            "SalaryCompositionCode",
-            "SalaryCompositionName",
-            "SalaryCompositionType",
-            "CreatedDate"
-        };
-
-        private static readonly HashSet<string> AllowedAdvancedFilterFields = new(StringComparer.OrdinalIgnoreCase)
+        private static readonly HashSet<string> AllowedAdvancedFilterAndSortFields = new(StringComparer.OrdinalIgnoreCase)
         {
             "SalaryCompositionCode",
             "SalaryCompositionName",
@@ -36,7 +28,7 @@ namespace FresherMisa.Application.Services
             "ValueType",
             "ValueFormula",
             "Description",
-            "PayslipDisplayType"
+            "PayslipDisplayType",
         };
 
         public SalaryCompositionSystemService(
@@ -60,18 +52,15 @@ namespace FresherMisa.Application.Services
         /// </param>
         /// <returns>Tổng số bản ghi và danh sách dữ liệu</returns>
         /// CREATED BY: VVHung (03/06/2026)
-        public async Task<ServiceResponse> FilterAsync(
-            SalaryCompositionSystemFilterRequest request)
+        public async Task<ServiceResponse> FilterAsync(SalaryCompositionSystemFilterRequest request)
         {
-            var sortResult = QueryInputNormalizer.NormalizeSort(request.Sort, AllowedSortFields);
+            var sortResult = QueryInputNormalizer.NormalizeSort(request.Sort, AllowedAdvancedFilterAndSortFields);
             if (!sortResult.IsValid)
             {
                 return CreateErrorResponse(ResponseCode.BadRequest, sortResult.Error);
             }
 
-            var filterResult = QueryInputNormalizer.ValidateAdvancedFilterFields(
-                request.AdvancedFilters,
-                AllowedAdvancedFilterFields);
+            var filterResult = QueryInputNormalizer.ValidateAdvancedFilterFields(request.AdvancedFilters,AllowedAdvancedFilterAndSortFields);
             if (!filterResult.IsValid)
             {
                 return CreateErrorResponse(ResponseCode.BadRequest, filterResult.Error);
